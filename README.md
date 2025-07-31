@@ -2,6 +2,8 @@
 
 A Cursor extension that visualizes parent-child relationships in Laravel Blade template files.
 
+<!-- Last Updated: 2025/7/31 15:26:32 -->
+
 ## Features
 
 - Visualize Blade template inheritance tree
@@ -243,7 +245,23 @@ code --install-extension laravel-blade-visualizer-0.1.0.vsix
 
 ## License
 
-MIT
+このプロジェクトは [MIT License](LICENSE) の下で公開されています。
+
+- **英語版**: [LICENSE](LICENSE)
+- **日本語版**: [LICENSE.ja.md](LICENSE.ja.md)
+
+### ライセンスの概要
+
+MITライセンスにより、以下のことが許可されています：
+- ソフトウェアの自由な使用、複製、変更
+- 商用利用
+- 再配布
+- 修正版の作成
+
+詳細については、上記のライセンスファイルをご確認ください。
+
+---
+
 laravelのbladeファイルの親子関係を可視化する
 
 ## テスト開発
