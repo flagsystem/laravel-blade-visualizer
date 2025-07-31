@@ -2,7 +2,7 @@
 
 A Cursor extension that visualizes parent-child relationships in Laravel Blade template files.
 
-<!-- Last Updated: 2025/7/31 15:44:44 -->
+<!-- Last Updated: 2025/7/31 16:04:11 -->
 
 ## Features
 
@@ -213,6 +213,20 @@ perf: パフォーマンスの改善
 最新のリリースは [GitHub Releases](https://github.com/flagsystem/laravel-blade-visualizer/releases) からダウンロードできます。
 
 **最新版**: [v0.1.2](https://github.com/flagsystem/laravel-blade-visualizer/releases/latest)
+
+### 📖 ドキュメント
+
+#### **クイックスタートガイド**
+5分で始めるための[クイックスタートガイド](docs/quick-start.md)をご覧ください。
+
+#### **ユーザーマニュアル**
+詳細な使用方法については、[ユーザーマニュアル](docs/user-manual.md)をご覧ください。
+
+- **インストール方法**: 3つの異なるインストール方法を説明
+- **基本的な使い方**: 拡張機能の有効化から実際の使用まで
+- **機能詳細**: テンプレート解析、ナビゲーション、リアルタイム更新
+- **トラブルシューティング**: よくある問題と解決方法
+- **よくある質問**: FAQ形式での詳細な説明
 
 ### GitHub Actions権限設定
 
