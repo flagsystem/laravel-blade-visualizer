@@ -75,24 +75,28 @@ jobs:
     - name: リポジトリをチェックアウト
       uses: actions/checkout@v4
 
-    - name: Node.jsをセットアップ
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22'
-        cache: 'npm'
-
-    - name: 依存関係をインストール
-      run: npm ci
-
-    - name: 拡張機能をパッケージ化
-      run: npm run package
-
     - name: バージョン情報を取得
       id: get-version
       run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
+    - name: 既存のタグをチェック
+      id: check-tag
+      run: |
+        if git ls-remote --tags origin v${{ steps.get-version.outputs.version }} | grep -q v${{ steps.get-version.outputs.version }}; then
+          echo "tag_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "tag_exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: パッケージファイルをダウンロード
+      uses: actions/download-artifact@v4
+      with:
+        name: laravel-blade-visualizer
+        path: dist/
+
     - name: リリースを作成
       uses: softprops/action-gh-release@v1
+      if: steps.check-tag.outputs.tag_exists == 'false'
       with:
         files: dist/laravel-blade-visualizer-*.vsix
         generate_release_notes: true
@@ -101,4 +105,10 @@ jobs:
         tag_name: v${{ steps.get-version.outputs.version }}
         name: Release v${{ steps.get-version.outputs.version }}
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: タグが既に存在する場合のメッセージ
+      if: steps.check-tag.outputs.tag_exists == 'true'
+      run: |
+        echo "⚠️  タグ v${{ steps.get-version.outputs.version }} は既に存在します。リリースをスキップします。"
+        echo "新しいリリースを作成するには、package.jsonのバージョンを更新してください。" 

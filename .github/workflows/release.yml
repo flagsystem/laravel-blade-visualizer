@@ -46,8 +46,18 @@ jobs:
     - name: 拡張機能をパッケージ化
       run: npm run package
 
+    - name: 既存のタグをチェック
+      id: check-tag
+      run: |
+        if git ls-remote --tags origin v${{ github.event.inputs.version }} | grep -q v${{ github.event.inputs.version }}; then
+          echo "tag_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "tag_exists=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: リリースを作成
       uses: softprops/action-gh-release@v1
+      if: steps.check-tag.outputs.tag_exists == 'false'
       with:
         files: dist/laravel-blade-visualizer-*.vsix
         generate_release_notes: true
@@ -56,4 +66,11 @@ jobs:
         tag_name: v${{ github.event.inputs.version }}
         name: Release v${{ github.event.inputs.version }}
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: タグが既に存在する場合のエラー
+      if: steps.check-tag.outputs.tag_exists == 'true'
+      run: |
+        echo "❌ タグ v${{ github.event.inputs.version }} は既に存在します。"
+        echo "別のバージョン番号を指定してください。"
+        exit 1 

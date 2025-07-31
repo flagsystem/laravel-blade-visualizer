@@ -2,7 +2,7 @@
     "name": "laravel-blade-visualizer",
     "displayName": "Laravel Blade Visualizer",
     "description": "Visualize parent-child relationships in Laravel Blade template files",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "engines": {
         "vscode": "^1.74.0"
     },
