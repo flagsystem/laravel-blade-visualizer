@@ -59,8 +59,11 @@ npm run compile
 laravel-blade-visualizer/
 ├── .devcontainer/          # Devcontainer configuration
 ├── src/                    # TypeScript source files
+├── __test__/              # Test files
 ├── out/                    # Compiled JavaScript files
 ├── scripts/                # Development scripts
+├── .github/workflows/      # CI/CD workflows
+├── .husky/                 # Git hooks
 ├── templates/              # Code templates
 ├── .cursorrules           # Cursor IDE rules
 ├── docker-compose.yml      # Docker Compose configuration
@@ -72,14 +75,70 @@ laravel-blade-visualizer/
 
 ### Available Scripts
 
+#### 開発スクリプト
 - `npm run compile` - Compile TypeScript to JavaScript
 - `npm run watch` - Watch for changes and recompile
 - `npm run lint` - Run ESLint
-- `npm run test` - Run tests
+- `npm run lint:fix` - Run ESLint with auto-fix
+- `npm run test` - Run VSCode extension tests
+- `npm run test:simple` - Run simple unit tests
 - `npm run test:watch` - Watch for file changes and run tests automatically
 - `npm run test:create` - Create test files for missing tests
+
+#### 品質チェックスクリプト
+- `npm run quality` - Run full quality check (compile + lint + test)
+- `npm run precommit` - Run pre-commit quality check
+- `npm run ci` - Run CI/CD pipeline (quality + package)
+
+#### パッケージ化スクリプト
 - `npm run package` - Package extension with automatic yes flag
 - `npm run package:version` - Package extension and update version
+
+## Quality Assurance
+
+### 自動品質チェック
+
+コミット時に自動的に品質チェックが実行されます：
+
+1. **TypeScriptコンパイル** - 型エラーのチェック
+2. **ESLint静的解析** - コードスタイルと品質のチェック
+3. **ユニットテスト** - 基本機能の動作確認
+
+### 手動品質チェック
+
+```bash
+# 完全な品質チェック
+npm run quality
+
+# コミット前チェック
+npm run precommit
+
+# CI/CDパイプライン
+npm run ci
+```
+
+### Git Hooks
+
+- **pre-commit**: コミット前に品質チェックを実行
+- **commit-msg**: コミットメッセージの形式をチェック
+
+### コミットメッセージの形式
+
+```
+type: 説明
+
+例:
+feat: 新機能の追加
+fix: バグ修正
+docs: ドキュメントの更新
+test: テストの追加
+refactor: リファクタリング
+style: コードスタイルの修正
+chore: その他の変更
+ci: CI/CDの設定変更
+build: ビルド設定の変更
+perf: パフォーマンスの改善
+```
 
 ## Building and Publishing
 

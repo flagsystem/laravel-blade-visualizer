@@ -1,0 +1,19 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# コミット前の品質チェックを実行
+echo "🔍 静的解析とテストを実行中..."
+npm run precommit
+
+# 品質チェックが成功した場合のみコミットを許可
+if [ $? -eq 0 ]; then
+    echo "✅ 品質チェックが完了しました。コミットを続行します。"
+    exit 0
+else
+    echo "❌ 品質チェックが失敗しました。コミットを中止します。"
+    echo "以下のコマンドで問題を修正してください："
+    echo "  npm run lint:fix    # リントエラーを自動修正"
+    echo "  npm run compile     # コンパイルエラーを修正"
+    echo "  npm run test:simple # テストを実行"
+    exit 1
+fi 

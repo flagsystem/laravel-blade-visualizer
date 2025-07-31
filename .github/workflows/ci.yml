@@ -1,0 +1,66 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality-check:
+    name: 品質チェック
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: リポジトリをチェックアウト
+      uses: actions/checkout@v4
+
+    - name: Node.jsをセットアップ
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: 依存関係をインストール
+      run: npm ci
+
+    - name: TypeScriptコンパイル
+      run: npm run compile
+
+    - name: ESLint静的解析
+      run: npm run lint
+
+    - name: ユニットテスト実行
+      run: npm run test:simple
+
+    - name: 品質チェック
+      run: npm run quality
+
+  package:
+    name: パッケージ作成
+    runs-on: ubuntu-latest
+    needs: quality-check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: リポジトリをチェックアウト
+      uses: actions/checkout@v4
+
+    - name: Node.jsをセットアップ
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: 依存関係をインストール
+      run: npm ci
+
+    - name: 拡張機能をパッケージ化
+      run: npm run package
+
+    - name: パッケージをアーティファクトとしてアップロード
+      uses: actions/upload-artifact@v4
+      with:
+        name: laravel-blade-visualizer
+        path: laravel-blade-visualizer-*.vsix
+        retention-days: 30 

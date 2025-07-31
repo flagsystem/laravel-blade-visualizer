@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import { BladeParser } from './BladeParser';
+import { BladeParser } from '../../src/parsers/BladeParser';
 
 /**
  * BladeParserクラスのテストスイート

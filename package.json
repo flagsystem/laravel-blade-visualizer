@@ -35,13 +35,19 @@
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile && npm run lint",
-        "lint": "eslint src --ext ts",
+        "lint": "eslint src __test__ --ext ts",
+        "lint:fix": "eslint src __test__ --ext ts --fix",
         "test": "node ./out/test/runTest.js",
         "test:watch": "node scripts/test-watch.js",
         "test:create": "node scripts/test-watch.js --create-only",
+        "test:unit": "mocha __test__/**/*.test.ts --require ts-node/register",
+        "test:simple": "node scripts/simple-test.js",
         "package": "node scripts/package.js",
         "package:version": "node scripts/package.js --version",
-        "prepackage": "npm run compile && npm run lint && npm test"
+        "prepackage": "npm run compile && npm run lint && npm test",
+        "precommit": "node scripts/quality-check.js",
+        "quality": "npm run compile && npm run lint && npm run test:simple",
+        "ci": "npm run quality && npm run package"
     },
     "devDependencies": {
         "@types/mocha": "^10.0.10",
@@ -52,15 +58,18 @@
         "@vscode/test-electron": "^2.5.2",
         "eslint": "^8.26.0",
         "glob": "^11.0.3",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.1.2",
         "mocha": "^11.7.1",
+        "ts-node": "^10.9.2",
         "typescript": "^4.8.4",
         "vsce": "^2.15.0"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/yourusername/laravel-blade-visualizer.git"
+        "url": "https://github.com/flagsystem/laravel-blade-visualizer.git"
     },
-    "publisher": "ueda",
+    "publisher": "flagsystem",
     "keywords": [
         "laravel",
         "blade",
@@ -68,5 +77,21 @@
         "visualization",
         "php"
     ],
-    "license": "MIT"
+    "license": "MIT",
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged",
+            "commit-msg": "npm run precommit"
+        }
+    },
+    "lint-staged": {
+        "src/**/*.ts": [
+            "eslint --fix",
+            "git add"
+        ],
+        "__test__/**/*.ts": [
+            "eslint --fix",
+            "git add"
+        ]
+    }
 }

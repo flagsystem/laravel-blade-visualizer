@@ -18,6 +18,7 @@
                 "shd101wyy.markdown-preview-enhanced",
                 "dbaeumer.vscode-eslint",
                 "christian-kohler.path-intellisense",
+                "github.vscode-github-actions"
             ],
             "settings": {
                 "typescript.preferences.includePackageJsonAutoImports": "on",
