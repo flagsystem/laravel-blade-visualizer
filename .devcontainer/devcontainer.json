@@ -1,0 +1,36 @@
+{
+    "name": "Laravel Blade Visualizer Extension Dev",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "extension-dev",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.vscode-typescript-next",
+                "ms-vscode.vscode-json",
+                "ms-vscode.vscode-eslint",
+                "ms-vscode.vscode-prettier",
+                "ms-vscode.vscode-git",
+                "ms-vscode.vscode-github",
+                "ms-vscode.vscode-markdown",
+                "ms-vscode.vscode-yaml",
+                "ms-vscode.vscode-docker"
+            ],
+            "settings": {
+                "typescript.preferences.includePackageJsonAutoImports": "on",
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.fixAll.eslint": true
+                },
+                "files.associations": {
+                    "*.vsix": "zip"
+                }
+            }
+        }
+    },
+    "forwardPorts": [
+        3001
+    ],
+    "postCreateCommand": "npm install",
+    "remoteUser": "node"
+}
