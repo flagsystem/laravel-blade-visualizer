@@ -47,5 +47,11 @@ if [ $? -ne 0 ]; then
     echo "⚠️  ドキュメント更新でエラーが発生しましたが、コミットを継続します。"
 fi
 
+# 5. 生成されたドキュメントを自動的にgit add
+echo "📝 生成されたドキュメントをステージング中..."
+git add docs/structure/basic-structure.json 2>/dev/null || true
+git add README.md 2>/dev/null || true
+echo "✅ ドキュメントがステージングされました"
+
 echo "✅ すべての品質チェックが完了しました。コミットを続行します。"
 exit 0

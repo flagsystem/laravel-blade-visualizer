@@ -72,27 +72,63 @@ async function updateBasicStructure() {
         const structureDir = path.join('docs', 'structure');
         await fs.ensureDir(structureDir);
 
-        // 基本的な構造情報を生成
-        const structureInfo = {
+        const structurePath = path.join(structureDir, 'basic-structure.json');
+
+        // 現在のpackage.jsonからバージョン情報を取得
+        const packageJson = require('../package.json');
+
+        // 新しい構造情報を生成
+        const newStructureInfo = {
             lastUpdated: new Date().toISOString(),
             projectName: 'Laravel Blade Visualizer',
-            version: require('../package.json').version,
+            version: packageJson.version,
             directories: [
                 'src/',
                 '__test__/',
                 'docs/',
                 'scripts/',
                 'templates/'
-            ]
+            ],
+            // ファイル変更の検出用にハッシュを追加
+            contentHash: generateContentHash(packageJson.version)
         };
 
-        const structurePath = path.join(structureDir, 'basic-structure.json');
-        await fs.writeJson(structurePath, structureInfo, { spaces: 2 });
+        // 既存のファイルがあるかチェック
+        let shouldUpdate = true;
+        if (fs.existsSync(structurePath)) {
+            try {
+                const existingData = await fs.readJson(structurePath);
 
-        console.log('📁 基本構造ドキュメントを更新しました');
+                // バージョンが同じで、contentHashも同じ場合は更新をスキップ
+                if (existingData.version === newStructureInfo.version &&
+                    existingData.contentHash === newStructureInfo.contentHash) {
+                    shouldUpdate = false;
+                    console.log('📁 基本構造ドキュメントは最新です（更新をスキップ）');
+                }
+            } catch (error) {
+                console.log('⚠️  既存ファイルの読み込みエラー、新規作成します');
+            }
+        }
+
+        if (shouldUpdate) {
+            await fs.writeJson(structurePath, newStructureInfo, { spaces: 2 });
+            console.log('📁 基本構造ドキュメントを更新しました');
+        }
+
     } catch (error) {
         console.log('⚠️  構造ドキュメント更新のスキップ:', error.message);
     }
+}
+
+/**
+ * コンテンツハッシュを生成
+ * @param {string} version - バージョン情報
+ * @returns {string} ハッシュ値
+ */
+function generateContentHash(version) {
+    const crypto = require('crypto');
+    const content = `version:${version}`;
+    return crypto.createHash('md5').update(content).digest('hex').substring(0, 8);
 }
 
 // スクリプトが直接実行された場合
