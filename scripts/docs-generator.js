@@ -22,10 +22,10 @@ const { execSync } = require('child_process');
  * @throws {Error} 設定ファイルが見つからない場合、または読み込みに失敗した場合
  */
 function loadProjectStructure() {
-    const configPath = path.join('config', 'project-structure.json');
+    const configPath = path.join('.cache', 'project-structure.json');
 
     if (!fs.existsSync(configPath)) {
-        throw new Error(`設定ファイルが見つかりません: ${configPath}\n設定ファイルを作成してください: npm run config:init`);
+        throw new Error(`キャッシュファイルが見つかりません: ${configPath}\nキャッシュファイルを作成してください: npm run config:init`);
     }
 
     try {

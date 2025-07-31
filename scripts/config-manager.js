@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * プロジェクト構造設定管理スクリプト
+ * プロジェクト構造キャッシュ管理スクリプト
  * 
  * このスクリプトは以下の機能を提供します：
- * - 設定ファイルの検証
- * - 設定ファイルの更新
- * - 設定ファイルのバックアップ
- * - 設定ファイルの復元
+ * - キャッシュファイルの検証
+ * - キャッシュファイルの更新
+ * - キャッシュファイルのバックアップ
+ * - キャッシュファイルの復元
  */
 
 const fs = require('fs-extra');
@@ -16,11 +16,11 @@ const path = require('path');
 /**
  * 設定ファイルのパス
  */
-const CONFIG_PATH = path.join('config', 'project-structure.json');
-const BACKUP_PATH = path.join('config', 'project-structure.backup.json');
+const CONFIG_PATH = path.join('.cache', 'project-structure.json');
+const BACKUP_PATH = path.join('.cache', 'project-structure.backup.json');
 
 /**
- * 設定ファイルを検証
+ * キャッシュファイルを検証
  * @param {Object} config - 検証対象の設定
  * @returns {boolean} 検証結果
  */
@@ -29,35 +29,35 @@ function validateConfig(config) {
         // 必須フィールドのチェック
         for (const [dirName, dirInfo] of Object.entries(config)) {
             if (!dirInfo.description || !dirInfo.purpose) {
-                console.error(`❌ 設定エラー: ${dirName} に必須フィールドが不足しています`);
+                console.error(`❌ キャッシュエラー: ${dirName} に必須フィールドが不足しています`);
                 return false;
             }
 
             // filesフィールドの存在チェック
             if (!dirInfo.files) {
-                console.error(`❌ 設定エラー: ${dirName} に files フィールドが不足しています`);
+                console.error(`❌ キャッシュエラー: ${dirName} に files フィールドが不足しています`);
                 return false;
             }
         }
 
-        console.log('✅ 設定ファイルの検証が完了しました');
+        console.log('✅ キャッシュファイルの検証が完了しました');
         return true;
     } catch (error) {
-        console.error('❌ 設定ファイルの検証中にエラーが発生しました:', error.message);
+        console.error('❌ キャッシュファイルの検証中にエラーが発生しました:', error.message);
         return false;
     }
 }
 
 /**
- * 設定ファイルをバックアップ
+ * キャッシュファイルをバックアップ
  */
 async function backupConfig() {
     try {
         if (await fs.pathExists(CONFIG_PATH)) {
             await fs.copy(CONFIG_PATH, BACKUP_PATH);
-            console.log('✅ 設定ファイルをバックアップしました:', BACKUP_PATH);
+            console.log('✅ キャッシュファイルをバックアップしました:', BACKUP_PATH);
         } else {
-            console.warn('⚠️ バックアップ対象の設定ファイルが見つかりません');
+            console.warn('⚠️ バックアップ対象のキャッシュファイルが見つかりません');
         }
     } catch (error) {
         console.error('❌ バックアップ中にエラーが発生しました:', error.message);
@@ -65,13 +65,13 @@ async function backupConfig() {
 }
 
 /**
- * 設定ファイルを復元
+ * キャッシュファイルを復元
  */
 async function restoreConfig() {
     try {
         if (await fs.pathExists(BACKUP_PATH)) {
             await fs.copy(BACKUP_PATH, CONFIG_PATH);
-            console.log('✅ 設定ファイルを復元しました:', CONFIG_PATH);
+            console.log('✅ キャッシュファイルを復元しました:', CONFIG_PATH);
         } else {
             console.warn('⚠️ 復元対象のバックアップファイルが見つかりません');
         }
@@ -81,7 +81,7 @@ async function restoreConfig() {
 }
 
 /**
- * 設定ファイルを更新
+ * キャッシュファイルを更新
  * @param {Object} updates - 更新内容
  */
 async function updateConfig(updates) {
@@ -98,30 +98,30 @@ async function updateConfig(updates) {
 
         // 設定を検証
         if (!validateConfig(config)) {
-            console.error('❌ 設定の更新を中止します');
+            console.error('❌ キャッシュの更新を中止します');
             return false;
         }
 
         // 設定を保存
-        await fs.ensureDir('config');
+        await fs.ensureDir('.cache');
         await fs.writeJson(CONFIG_PATH, config, { spaces: 2 });
-        console.log('✅ 設定ファイルを更新しました:', CONFIG_PATH);
+        console.log('✅ キャッシュファイルを更新しました:', CONFIG_PATH);
 
         return true;
     } catch (error) {
-        console.error('❌ 設定ファイルの更新中にエラーが発生しました:', error.message);
+        console.error('❌ キャッシュファイルの更新中にエラーが発生しました:', error.message);
         return false;
     }
 }
 
 /**
- * 設定ファイルを初期化
+ * キャッシュファイルを初期化
  */
 async function initConfig() {
     try {
-        // 設定ファイルが既に存在するかチェック
+        // キャッシュファイルが既に存在するかチェック
         if (await fs.pathExists(CONFIG_PATH)) {
-            console.log('⚠️ 設定ファイルは既に存在します');
+            console.log('⚠️ キャッシュファイルは既に存在します');
             console.log(`   ファイル: ${CONFIG_PATH}`);
             console.log('   上書きする場合は --force フラグを使用してください');
             return false;
@@ -208,32 +208,32 @@ async function initConfig() {
             }
         };
 
-        // 設定ファイルを作成
-        await fs.ensureDir('config');
+        // キャッシュファイルを作成
+        await fs.ensureDir('.cache');
         await fs.writeJson(CONFIG_PATH, defaultConfig, { spaces: 2 });
 
-        console.log('✅ 設定ファイルを初期化しました:', CONFIG_PATH);
-        console.log('📝 設定ファイルを編集してプロジェクト構造に合わせてください');
+        console.log('✅ キャッシュファイルを初期化しました:', CONFIG_PATH);
+        console.log('📝 キャッシュファイルを編集してプロジェクト構造に合わせてください');
 
         return true;
     } catch (error) {
-        console.error('❌ 設定ファイルの初期化に失敗しました:', error.message);
+        console.error('❌ キャッシュファイルの初期化に失敗しました:', error.message);
         return false;
     }
 }
 
 /**
- * 設定ファイルの状態を表示
+ * キャッシュファイルの状態を表示
  */
 async function showConfigStatus() {
     try {
-        console.log('📋 設定ファイルの状態:');
+        console.log('📋 キャッシュファイルの状態:');
 
         if (await fs.pathExists(CONFIG_PATH)) {
             const configData = await fs.readFile(CONFIG_PATH, 'utf8');
             const config = JSON.parse(configData);
 
-            console.log(`   📁 設定ファイル: ${CONFIG_PATH}`);
+            console.log(`   📁 キャッシュファイル: ${CONFIG_PATH}`);
             console.log(`   📊 ディレクトリ数: ${Object.keys(config).length}`);
 
             // 各ディレクトリの情報を表示
@@ -242,8 +242,8 @@ async function showConfigStatus() {
                 console.log(`      - ${dirName}/ (${fileCount} ファイル)`);
             }
         } else {
-            console.log('   ❌ 設定ファイルが見つかりません');
-            console.log('   💡 設定ファイルを初期化してください: npm run config:init');
+            console.log('   ❌ キャッシュファイルが見つかりません');
+            console.log('   💡 キャッシュファイルを初期化してください: npm run config:init');
         }
 
         if (await fs.pathExists(BACKUP_PATH)) {
@@ -253,7 +253,7 @@ async function showConfigStatus() {
         }
 
     } catch (error) {
-        console.error('❌ 設定ファイルの状態確認中にエラーが発生しました:', error.message);
+        console.error('❌ キャッシュファイルの状態確認中にエラーが発生しました:', error.message);
     }
 }
 
@@ -262,18 +262,18 @@ async function showConfigStatus() {
  */
 function showHelp() {
     console.log(`
-📋 プロジェクト構造設定管理ツール
+📋 プロジェクト構造キャッシュ管理ツール
 
 使用方法:
   node scripts/config-manager.js [コマンド] [オプション]
 
 コマンド:
-  init        設定ファイルを初期化
-  validate    設定ファイルを検証
-  backup      設定ファイルをバックアップ
-  restore     設定ファイルを復元
-  status      設定ファイルの状態を表示
-  update      設定ファイルを更新（対話モード）
+  init        キャッシュファイルを初期化
+  validate    キャッシュファイルを検証
+  backup      キャッシュファイルをバックアップ
+  restore     キャッシュファイルを復元
+  status      キャッシュファイルの状態を表示
+  update      キャッシュファイルを更新（対話モード）
 
 例:
   node scripts/config-manager.js init
@@ -306,7 +306,7 @@ async function main() {
                 const config = JSON.parse(configData);
                 validateConfig(config);
             } catch (error) {
-                console.error('❌ 設定ファイルの検証に失敗しました:', error.message);
+                console.error('❌ キャッシュファイルの検証に失敗しました:', error.message);
             }
             break;
 
@@ -323,8 +323,8 @@ async function main() {
             break;
 
         case 'update':
-            console.log('🔄 設定ファイルの更新モード');
-            console.log('   現在の設定を確認してから更新してください');
+            console.log('🔄 キャッシュファイルの更新モード');
+            console.log('   現在のキャッシュを確認してから更新してください');
             await showConfigStatus();
             break;
 
