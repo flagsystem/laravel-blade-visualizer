@@ -1,97 +1,107 @@
 {
-    "name": "laravel-blade-visualizer",
-    "displayName": "Laravel Blade Visualizer",
-    "description": "Visualize parent-child relationships in Laravel Blade template files",
-    "version": "0.1.1",
-    "engines": {
-        "vscode": "^1.74.0"
-    },
-    "categories": [
-        "Other"
+  "name": "laravel-blade-visualizer",
+  "displayName": "Laravel Blade Visualizer",
+  "description": "Visualize parent-child relationships in Laravel Blade template files",
+  "version": "0.1.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:blade",
+    "onLanguage:php"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "laravel-blade-visualizer.showTree",
+        "title": "Show Blade Template Tree"
+      }
     ],
-    "activationEvents": [
-        "onLanguage:blade",
-        "onLanguage:php"
-    ],
-    "main": "./out/extension.js",
-    "contributes": {
-        "commands": [
-            {
-                "command": "laravel-blade-visualizer.showTree",
-                "title": "Show Blade Template Tree"
-            }
-        ],
-        "views": {
-            "explorer": [
-                {
-                    "id": "bladeTemplateTree",
-                    "name": "Blade Template Tree"
-                }
-            ]
+    "views": {
+      "explorer": [
+        {
+          "id": "bladeTemplateTree",
+          "name": "Blade Template Tree"
         }
-    },
-    "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "pretest": "npm run compile && npm run lint",
-        "lint": "eslint src __test__ --ext ts",
-        "lint:fix": "eslint src __test__ --ext ts --fix",
-        "test": "node ./out/test/runTest.js",
-        "test:watch": "node scripts/test-watch.js",
-        "test:create": "node scripts/test-watch.js --create-only",
-        "test:unit": "mocha __test__/**/*.test.ts --require ts-node/register",
-        "test:simple": "node scripts/simple-test.js",
-        "package": "node scripts/package.js",
-        "package:version": "node scripts/package.js --version",
-        "prepackage": "npm run compile && npm run lint && npm test",
-        "precommit": "node scripts/quality-check.js",
-        "quality": "npm run compile && npm run lint && npm run test:simple",
-        "ci": "npm run quality && npm run package"
-    },
-    "devDependencies": {
-        "@types/mocha": "^10.0.10",
-        "@types/node": "16.x",
-        "@types/vscode": "^1.74.0",
-        "@typescript-eslint/eslint-plugin": "^5.42.0",
-        "@typescript-eslint/parser": "^5.42.0",
-        "@vscode/test-electron": "^2.5.2",
-        "eslint": "^8.26.0",
-        "glob": "^11.0.3",
-        "husky": "^9.1.7",
-        "lint-staged": "^16.1.2",
-        "mocha": "^11.7.1",
-        "ts-node": "^10.9.2",
-        "typescript": "^4.8.4",
-        "vsce": "^2.15.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/flagsystem/laravel-blade-visualizer.git"
-    },
-    "publisher": "flagsystem",
-    "keywords": [
-        "laravel",
-        "blade",
-        "template",
-        "visualization",
-        "php"
-    ],
-    "license": "MIT",
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged",
-            "commit-msg": "npm run precommit"
-        }
-    },
-    "lint-staged": {
-        "src/**/*.ts": [
-            "eslint --fix",
-            "git add"
-        ],
-        "__test__/**/*.ts": [
-            "eslint --fix",
-            "git add"
-        ]
+      ]
     }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src __test__ --ext ts",
+    "lint:fix": "eslint src __test__ --ext ts --fix",
+    "test": "node ./out/test/runTest.js",
+    "test:watch": "node scripts/test-watch.js",
+    "test:create": "node scripts/test-watch.js --create-only",
+    "test:unit": "mocha __test__/**/*.test.ts --require ts-node/register",
+    "test:simple": "node scripts/simple-test.js",
+    "package": "node scripts/package.js",
+    "package:version": "node scripts/package.js --version",
+    "prepackage": "npm run compile && npm run lint && npm run test:simple",
+    "precommit": "node scripts/quality-check.js",
+    "quality": "npm run compile && npm run lint && npm run test:simple",
+    "ci": "npm run quality && npm run package",
+    "docs:generate": "node scripts/docs-generator.js",
+    "docs:watch": "node scripts/docs-watcher.js",
+    "docs:update": "npm run docs:generate && npm run quality",
+    "docs:generate:enhanced": "node scripts/docs-generator-enhanced.js",
+    "docs:watch:enhanced": "node scripts/docs-watcher.js --enhanced",
+    "docs:typedoc": "npx typedoc --out docs/api --excludePrivate --excludeProtected --excludeExternals --includeVersion --readme README.md src/",
+    "docs:jsdoc": "npx jsdoc --destination docs/js-api --template node_modules/clean-jsdoc-theme --configure jsdoc.json src/",
+    "docs:structure": "node scripts/docs-generator.js",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
+    "@typescript-eslint/parser": "^5.42.0",
+    "@vscode/test-electron": "^2.5.2",
+    "chokidar": "^3.5.3",
+    "clean-jsdoc-theme": "^4.3.0",
+    "eslint": "^8.26.0",
+    "fs-extra": "^11.2.0",
+    "glob": "^11.0.3",
+    "husky": "^9.1.7",
+    "jsdoc": "^4.0.4",
+    "lint-staged": "^16.1.2",
+    "marked": "^12.0.0",
+    "mocha": "^11.7.1",
+    "ts-node": "^10.9.2",
+    "typedoc": "^0.24.8",
+    "typescript": "^4.8.4",
+    "vsce": "^2.15.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flagsystem/laravel-blade-visualizer.git"
+  },
+  "publisher": "flagsystem",
+  "keywords": [
+    "laravel",
+    "blade",
+    "template",
+    "visualization",
+    "php"
+  ],
+  "license": "MIT",
+  "prepare": "husky",
+  "lint-staged": {
+    "src/**/*.ts": [
+      "eslint --fix",
+      "git add"
+    ],
+    "__test__/**/*.ts": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
 }

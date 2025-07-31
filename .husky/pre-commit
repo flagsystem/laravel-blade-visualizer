@@ -1,5 +1,9 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# ドキュメント自動更新
+echo "📚 ドキュメントを自動更新中..."
+npm run docs:generate:enhanced
 
 # コミット前の品質チェックを実行
 echo "🔍 静的解析とテストを実行中..."
@@ -16,4 +20,4 @@ else
     echo "  npm run compile     # コンパイルエラーを修正"
     echo "  npm run test:simple # テストを実行"
     exit 1
-fi 
+fi

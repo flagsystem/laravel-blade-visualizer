@@ -1,0 +1,256 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>laravel-blade-visualizer - v0.1.1</title><meta name="description" content="Documentation for laravel-blade-visualizer"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container">
+<div class="table-cell" id="tsd-search" data-base=".">
+<div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
+<div class="field">
+<div id="tsd-toolbar-links"></div></div>
+<ul class="results">
+<li class="state loading">Preparing search index...</li>
+<li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">laravel-blade-visualizer - v0.1.1</a></div>
+<div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="7" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="11" width="14" height="2" fill="var(--color-text)"></rect></svg></a></div></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<h2>laravel-blade-visualizer - v0.1.1</h2></div>
+<div class="tsd-panel tsd-typography"><a id="md:laravel-blade-visualizer" class="tsd-anchor"></a><h1><a href="#md:laravel-blade-visualizer">Laravel Blade Visualizer</a></h1><p>A Cursor extension that visualizes parent-child relationships in Laravel Blade template files.</p>
+<a id="md:features" class="tsd-anchor"></a><h2><a href="#md:features">Features</a></h2><ul>
+<li>Visualize Blade template inheritance tree</li>
+<li>Navigate between parent and child templates</li>
+<li>Real-time parsing of <code>@extends</code>, <code>@include</code>, and <code>@component</code> directives</li>
+<li>Sidebar tree view for template relationships</li>
+</ul>
+<a id="md:development-environment-setup" class="tsd-anchor"></a><h2><a href="#md:development-environment-setup">Development Environment Setup</a></h2><a id="md:prerequisites" class="tsd-anchor"></a><h3><a href="#md:prerequisites">Prerequisites</a></h3><ul>
+<li>Docker and Docker Compose</li>
+<li>Cursor IDE</li>
+</ul>
+<a id="md:getting-started" class="tsd-anchor"></a><h3><a href="#md:getting-started">Getting Started</a></h3><ol>
+<li>Clone the repository:</li>
+</ol>
+<pre><code class="language-bash"><span class="hl-0">git</span><span class="hl-1"> </span><span class="hl-2">clone</span><span class="hl-1"> </span><span class="hl-2">https://github.com/yourusername/laravel-blade-visualizer.git</span><br/><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-2">laravel-blade-visualizer</span>
+</code><button>Copy</button></pre>
+<ol start="2">
+<li><p>Open the project in Cursor and use the devcontainer:</p>
+<ul>
+<li>Cursor will automatically detect the <code>.devcontainer</code> configuration</li>
+<li>Click &quot;Reopen in Container&quot; when prompted</li>
+<li>The development environment will be set up automatically</li>
+<li>The extension debug port is available at <code>localhost:3001</code></li>
+</ul>
+</li>
+<li><p>Install dependencies (if not done automatically):</p>
+</li>
+</ol>
+<pre><code class="language-bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span>
+</code><button>Copy</button></pre>
+<ol start="4">
+<li>Compile the extension:</li>
+</ol>
+<pre><code class="language-bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">compile</span>
+</code><button>Copy</button></pre>
+<ol start="5">
+<li>Press F5 to start debugging the extension</li>
+</ol>
+<a id="md:development" class="tsd-anchor"></a><h2><a href="#md:development">Development</a></h2><a id="md:cursor-ide-rules" class="tsd-anchor"></a><h3><a href="#md:cursor-ide-rules">Cursor IDE Rules</a></h3><p>このプロジェクトには <code>.cursorrules</code> ファイルが含まれており、以下のルールが設定されています：</p>
+<ul>
+<li><strong>日本語コメントの充実化</strong>: すべての関数、クラス、メソッドに日本語での詳細なコメントを記述</li>
+<li><strong>テストの自動作成</strong>: 新しいコード作成時に自動でテストファイルを生成</li>
+<li><strong>テストの自動実行</strong>: ファイル変更時に自動でテストを実行し、失敗時は即座に修正</li>
+<li><strong>テストケース命名</strong>: <code>test</code> で始まる完結でわかりやすいテストケース名</li>
+</ul>
+<a id="md:project-structure" class="tsd-anchor"></a><h3><a href="#md:project-structure">Project Structure</a></h3><pre><code><span class="hl-3">laravel</span><span class="hl-1">-</span><span class="hl-3">blade</span><span class="hl-1">-</span><span class="hl-3">visualizer</span><span class="hl-1">/</span><br/><span class="hl-1">├── .</span><span class="hl-3">devcontainer</span><span class="hl-1">/          # </span><span class="hl-3">Devcontainer</span><span class="hl-1"> </span><span class="hl-3">configuration</span><br/><span class="hl-1">├── </span><span class="hl-3">src</span><span class="hl-1">/                    # </span><span class="hl-3">TypeScript</span><span class="hl-1"> </span><span class="hl-3">source</span><span class="hl-1"> </span><span class="hl-3">files</span><br/><span class="hl-1">├── </span><span class="hl-3">__test__</span><span class="hl-1">/              # </span><span class="hl-3">Test</span><span class="hl-1"> </span><span class="hl-3">files</span><br/><span class="hl-1">├── </span><span class="hl-3">out</span><span class="hl-1">/                    # </span><span class="hl-3">Compiled</span><span class="hl-1"> </span><span class="hl-3">JavaScript</span><span class="hl-1"> </span><span class="hl-3">files</span><br/><span class="hl-1">├── </span><span class="hl-3">scripts</span><span class="hl-1">/                # </span><span class="hl-3">Development</span><span class="hl-1"> </span><span class="hl-3">scripts</span><br/><span class="hl-1">├── .</span><span class="hl-3">github</span><span class="hl-1">/</span><span class="hl-3">workflows</span><span class="hl-1">/      # </span><span class="hl-4">CI</span><span class="hl-1">/</span><span class="hl-4">CD</span><span class="hl-1"> </span><span class="hl-3">workflows</span><br/><span class="hl-1">├── .</span><span class="hl-3">husky</span><span class="hl-1">/                 # </span><span class="hl-3">Git</span><span class="hl-1"> </span><span class="hl-3">hooks</span><br/><span class="hl-1">├── </span><span class="hl-3">templates</span><span class="hl-1">/              # </span><span class="hl-3">Code</span><span class="hl-1"> </span><span class="hl-3">templates</span><br/><span class="hl-1">├── .</span><span class="hl-3">cursorrules</span><span class="hl-1">           # </span><span class="hl-3">Cursor</span><span class="hl-1"> </span><span class="hl-4">IDE</span><span class="hl-1"> </span><span class="hl-3">rules</span><br/><span class="hl-1">├── </span><span class="hl-3">docker</span><span class="hl-1">-</span><span class="hl-3">compose</span><span class="hl-1">.</span><span class="hl-3">yml</span><span class="hl-1">      # </span><span class="hl-3">Docker</span><span class="hl-1"> </span><span class="hl-3">Compose</span><span class="hl-1"> </span><span class="hl-3">configuration</span><br/><span class="hl-1">├── </span><span class="hl-3">Dockerfile</span><span class="hl-1">             # </span><span class="hl-3">Docker</span><span class="hl-1"> </span><span class="hl-3">image</span><span class="hl-1"> </span><span class="hl-3">definition</span><br/><span class="hl-1">├── </span><span class="hl-3">package</span><span class="hl-1">.</span><span class="hl-3">json</span><span class="hl-1">           # </span><span class="hl-3">Extension</span><span class="hl-1"> </span><span class="hl-3">manifest</span><br/><span class="hl-1">├── </span><span class="hl-3">tsconfig</span><span class="hl-1">.</span><span class="hl-3">json</span><span class="hl-1">          # </span><span class="hl-3">TypeScript</span><span class="hl-1"> </span><span class="hl-3">configuration</span><br/><span class="hl-1">└── </span><span class="hl-4">README</span><span class="hl-1">.</span><span class="hl-3">md</span><span class="hl-1">             # </span><span class="hl-3">This</span><span class="hl-1"> </span><span class="hl-3">file</span>
+</code><button>Copy</button></pre>
+<a id="md:available-scripts" class="tsd-anchor"></a><h3><a href="#md:available-scripts">Available Scripts</a></h3><a id="md:開発スクリプト" class="tsd-anchor"></a><h4><a href="#md:開発スクリプト">開発スクリプト</a></h4><ul>
+<li><code>npm run compile</code> - Compile TypeScript to JavaScript</li>
+<li><code>npm run watch</code> - Watch for changes and recompile</li>
+<li><code>npm run lint</code> - Run ESLint</li>
+<li><code>npm run lint:fix</code> - Run ESLint with auto-fix</li>
+<li><code>npm run test</code> - Run VSCode extension tests</li>
+<li><code>npm run test:simple</code> - Run simple unit tests</li>
+<li><code>npm run test:watch</code> - Watch for file changes and run tests automatically</li>
+<li><code>npm run test:create</code> - Create test files for missing tests</li>
+</ul>
+<a id="md:品質チェックスクリプト" class="tsd-anchor"></a><h4><a href="#md:品質チェックスクリプト">品質チェックスクリプト</a></h4><ul>
+<li><code>npm run quality</code> - Run full quality check (compile + lint + test)</li>
+<li><code>npm run precommit</code> - Run pre-commit quality check</li>
+<li><code>npm run ci</code> - Run CI/CD pipeline (quality + package)</li>
+</ul>
+<a id="md:パッケージ化スクリプト" class="tsd-anchor"></a><h4><a href="#md:パッケージ化スクリプト">パッケージ化スクリプト</a></h4><ul>
+<li><code>npm run package</code> - Package extension with automatic yes flag</li>
+<li><code>npm run package:version</code> - Package extension and update version</li>
+</ul>
+<a id="md:ドキュメント自動生成スクリプト" class="tsd-anchor"></a><h4><a href="#md:ドキュメント自動生成スクリプト">ドキュメント自動生成スクリプト</a></h4><ul>
+<li><code>npm run docs:generate</code> - プロジェクト構造とソースコードの説明を自動生成</li>
+<li><code>npm run docs:watch</code> - ファイル変更を監視してドキュメントを自動更新</li>
+<li><code>npm run docs:update</code> - ドキュメント生成と品質チェックを実行</li>
+<li><code>npm run docs:generate:enhanced</code> - 既存ライブラリを活用した拡張版ドキュメント生成</li>
+<li><code>npm run docs:watch:enhanced</code> - 拡張版ドキュメントの監視モード</li>
+<li><code>npm run docs:typedoc</code> - TypeDocによるAPIドキュメント生成</li>
+<li><code>npm run docs:jsdoc</code> - JSDocによるAPIドキュメント生成</li>
+<li><code>npm run docs:structure</code> - プロジェクト構造ドキュメントのみ生成</li>
+</ul>
+<a id="md:quality-assurance" class="tsd-anchor"></a><h2><a href="#md:quality-assurance">Quality Assurance</a></h2><a id="md:自動品質チェック" class="tsd-anchor"></a><h3><a href="#md:自動品質チェック">自動品質チェック</a></h3><a id="md:ドキュメント自動生成" class="tsd-anchor"></a><h3><a href="#md:ドキュメント自動生成">ドキュメント自動生成</a></h3><p>このプロジェクトには、プロジェクト構造とソースコードの説明を自動生成する機能が組み込まれています：</p>
+<a id="md:機能" class="tsd-anchor"></a><h4><a href="#md:機能">機能</a></h4><ul>
+<li><strong>プロジェクト構造の自動解析</strong>: ディレクトリとファイルの階層構造を解析</li>
+<li><strong>ソースコードの説明抽出</strong>: JSDocコメントと単行コメントから説明を抽出</li>
+<li><strong>Markdown形式でのドキュメント生成</strong>: 読みやすい形式でドキュメントを生成</li>
+<li><strong>ファイル変更監視</strong>: プロジェクトファイルの変更を監視して自動更新</li>
+<li><strong>Git hooks連携</strong>: コミット時に自動でドキュメントを更新</li>
+</ul>
+<a id="md:生成されるドキュメント" class="tsd-anchor"></a><h4><a href="#md:生成されるドキュメント">生成されるドキュメント</a></h4><ul>
+<li><code>docs/STRUCTURE.md</code> - プロジェクト構造の詳細説明</li>
+<li><code>docs/TECHNICAL.md</code> - 技術資料（自動更新）</li>
+</ul>
+<a id="md:使用方法" class="tsd-anchor"></a><h4><a href="#md:使用方法">使用方法</a></h4><pre><code class="language-bash"><span class="hl-5"># 一度だけドキュメントを生成</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:generate</span><br/><br/><span class="hl-5"># ファイル変更を監視して自動更新</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:watch</span><br/><br/><span class="hl-5"># ドキュメント生成と品質チェックを実行</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:update</span>
+</code><button>Copy</button></pre>
+<a id="md:監視対象" class="tsd-anchor"></a><h4><a href="#md:監視対象">監視対象</a></h4><ul>
+<li><code>src/</code> - TypeScriptソースコード</li>
+<li><code>__test__/</code> - テストファイル</li>
+<li><code>scripts/</code> - 開発用スクリプト</li>
+<li><code>docs/</code> - 技術資料</li>
+<li><code>templates/</code> - テンプレートファイル</li>
+<li><code>.github/</code> - CI/CD設定</li>
+</ul>
+<a id="md:自動更新の仕組み" class="tsd-anchor"></a><h4><a href="#md:自動更新の仕組み">自動更新の仕組み</a></h4><ul>
+<li><strong>chokidar</strong>: ファイル変更監視ライブラリ</li>
+<li><strong>デバウンス機能</strong>: 過度な更新を防止（2秒間隔）</li>
+<li><strong>Git hooks</strong>: コミット前の自動ドキュメント更新</li>
+<li><strong>CI/CD連携</strong>: 品質チェックパイプラインでの自動実行</li>
+</ul>
+<a id="md:既存ライブラリの活用" class="tsd-anchor"></a><h4><a href="#md:既存ライブラリの活用">既存ライブラリの活用</a></h4><ul>
+<li><strong>TypeDoc</strong>: TypeScript APIドキュメント生成</li>
+<li><strong>JSDoc</strong>: JavaScript APIドキュメント生成</li>
+<li><strong>clean-jsdoc-theme</strong>: 美しいJSDocテーマ</li>
+<li><strong>marked</strong>: Markdown生成ライブラリ</li>
+</ul>
+<p>コミット時に自動的に品質チェックが実行されます：</p>
+<ol>
+<li><strong>TypeScriptコンパイル</strong> - 型エラーのチェック</li>
+<li><strong>ESLint静的解析</strong> - コードスタイルと品質のチェック</li>
+<li><strong>ユニットテスト</strong> - 基本機能の動作確認</li>
+</ol>
+<a id="md:手動品質チェック" class="tsd-anchor"></a><h3><a href="#md:手動品質チェック">手動品質チェック</a></h3><pre><code class="language-bash"><span class="hl-5"># 完全な品質チェック</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">quality</span><br/><br/><span class="hl-5"># コミット前チェック</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">precommit</span><br/><br/><span class="hl-5"># CI/CDパイプライン</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">ci</span>
+</code><button>Copy</button></pre>
+<a id="md:git-hooks" class="tsd-anchor"></a><h3><a href="#md:git-hooks">Git Hooks</a></h3><ul>
+<li><strong>pre-commit</strong>: コミット前に品質チェックを実行</li>
+<li><strong>commit-msg</strong>: コミットメッセージの形式をチェック</li>
+</ul>
+<a id="md:コミットメッセージの形式" class="tsd-anchor"></a><h3><a href="#md:コミットメッセージの形式">コミットメッセージの形式</a></h3><pre><code><span class="hl-6">type</span><span class="hl-1">: </span><span class="hl-3">説明</span><br/><br/><span class="hl-6">例</span><span class="hl-1">:</span><br/><span class="hl-6">feat</span><span class="hl-1">: </span><span class="hl-3">新機能の追加</span><br/><span class="hl-6">fix</span><span class="hl-1">: </span><span class="hl-3">バグ修正</span><br/><span class="hl-6">docs</span><span class="hl-1">: </span><span class="hl-3">ドキュメントの更新</span><br/><span class="hl-6">test</span><span class="hl-1">: </span><span class="hl-3">テストの追加</span><br/><span class="hl-6">refactor</span><span class="hl-1">: </span><span class="hl-3">リファクタリング</span><br/><span class="hl-6">style</span><span class="hl-1">: </span><span class="hl-3">コードスタイルの修正</span><br/><span class="hl-6">chore</span><span class="hl-1">: </span><span class="hl-3">その他の変更</span><br/><span class="hl-6">ci</span><span class="hl-1">: </span><span class="hl-4">CI</span><span class="hl-1">/</span><span class="hl-3">CDの設定変更</span><br/><span class="hl-6">build</span><span class="hl-1">: </span><span class="hl-3">ビルド設定の変更</span><br/><span class="hl-6">perf</span><span class="hl-1">: </span><span class="hl-3">パフォーマンスの改善</span>
+</code><button>Copy</button></pre>
+<a id="md:building-and-publishing" class="tsd-anchor"></a><h2><a href="#md:building-and-publishing">Building and Publishing</a></h2><a id="md:自動パッケージ化" class="tsd-anchor"></a><h3><a href="#md:自動パッケージ化">自動パッケージ化</a></h3><ol>
+<li>基本的なパッケージ化（自動yesフラグ付き）:</li>
+</ol>
+<pre><code class="language-bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">package</span>
+</code><button>Copy</button></pre>
+<ol start="2">
+<li>パッケージ化とバージョン更新:</li>
+</ol>
+<pre><code class="language-bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">package:version</span>
+</code><button>Copy</button></pre>
+<a id="md:手動パッケージ化" class="tsd-anchor"></a><h3><a href="#md:手動パッケージ化">手動パッケージ化</a></h3><ol>
+<li>従来の方法:</li>
+</ol>
+<pre><code class="language-bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">compile</span><br/><span class="hl-0">npx</span><span class="hl-1"> </span><span class="hl-2">vsce</span><span class="hl-1"> </span><span class="hl-2">package</span>
+</code><button>Copy</button></pre>
+<ol start="2">
+<li>ローカルインストール:</li>
+</ol>
+<pre><code class="language-bash"><span class="hl-0">code</span><span class="hl-1"> </span><span class="hl-7">--install-extension</span><span class="hl-1"> </span><span class="hl-2">laravel-blade-visualizer-0.1.0.vsix</span>
+</code><button>Copy</button></pre>
+<a id="md:パッケージ化の自動処理" class="tsd-anchor"></a><h3><a href="#md:パッケージ化の自動処理">パッケージ化の自動処理</a></h3><p>パッケージ化スクリプトは以下の処理を自動実行します：</p>
+<ul>
+<li>TypeScriptコンパイル</li>
+<li>コード品質チェック（ESLint）</li>
+<li>テスト実行</li>
+<li>古いパッケージファイルの削除</li>
+<li>VSCEパッケージ化（--yesフラグ付き）</li>
+<li>バージョン更新（オプション）</li>
+</ul>
+<a id="md:license" class="tsd-anchor"></a><h2><a href="#md:license">License</a></h2><p>MIT
+laravelのbladeファイルの親子関係を可視化する</p>
+<a id="md:テスト開発" class="tsd-anchor"></a><h2><a href="#md:テスト開発">テスト開発</a></h2><a id="md:テストの実行" class="tsd-anchor"></a><h3><a href="#md:テストの実行">テストの実行</a></h3><pre><code class="language-bash"><span class="hl-5"># 通常のテスト実行</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">test</span><br/><br/><span class="hl-5"># ファイル変更を監視してテストを自動実行</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">test:watch</span><br/><br/><span class="hl-5"># 不足しているテストファイルを自動作成</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">test:create</span>
+</code><button>Copy</button></pre>
+<a id="md:テストテンプレート" class="tsd-anchor"></a><h3><a href="#md:テストテンプレート">テストテンプレート</a></h3><p><code>templates/test-template.ts</code> にテストファイルのテンプレートが用意されています。
+新しいテストファイルを作成する際は、このテンプレートを参考にしてください。</p>
+<a id="md:テストケースの命名規則" class="tsd-anchor"></a><h3><a href="#md:テストケースの命名規則">テストケースの命名規則</a></h3><ul>
+<li>テストケース名は <code>test</code> で始まる</li>
+<li>日本語または英語で分かりやすく記述</li>
+<li>例: <code>test正常な入力で期待される結果が返される</code></li>
+</ul>
+</div></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)" id="icon-chevronDown"></path></svg>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility">
+<h4 class="uppercase">Member Visibility</h4><form>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></form></div>
+<div class="tsd-theme-toggle">
+<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li>
+<ul>
+<li><a href="#md:laravel-blade-visualizer"><span>Laravel <wbr/>Blade <wbr/>Visualizer</span></a></li>
+<li>
+<ul>
+<li><a href="#md:features"><span>Features</span></a></li>
+<li><a href="#md:development-environment-setup"><span>Development <wbr/>Environment <wbr/>Setup</span></a></li>
+<li>
+<ul>
+<li><a href="#md:prerequisites"><span>Prerequisites</span></a></li>
+<li><a href="#md:getting-started"><span>Getting <wbr/>Started</span></a></li></ul></li>
+<li><a href="#md:development"><span>Development</span></a></li>
+<li>
+<ul>
+<li><a href="#md:cursor-ide-rules"><span>Cursor IDE <wbr/>Rules</span></a></li>
+<li><a href="#md:project-structure"><span>Project <wbr/>Structure</span></a></li>
+<li><a href="#md:available-scripts"><span>Available <wbr/>Scripts</span></a></li>
+<li>
+<ul>
+<li><a href="#md:開発スクリプト"><span>開発スクリプト</span></a></li>
+<li><a href="#md:品質チェックスクリプト"><span>品質チェックスクリプト</span></a></li>
+<li><a href="#md:パッケージ化スクリプト"><span>パッケージ化スクリプト</span></a></li>
+<li><a href="#md:ドキュメント自動生成スクリプト"><span>ドキュメント自動生成スクリプト</span></a></li></ul></li></ul></li>
+<li><a href="#md:quality-assurance"><span>Quality <wbr/>Assurance</span></a></li>
+<li>
+<ul>
+<li><a href="#md:自動品質チェック"><span>自動品質チェック</span></a></li>
+<li><a href="#md:ドキュメント自動生成"><span>ドキュメント自動生成</span></a></li>
+<li>
+<ul>
+<li><a href="#md:機能"><span>機能</span></a></li>
+<li><a href="#md:生成されるドキュメント"><span>生成されるドキュメント</span></a></li>
+<li><a href="#md:使用方法"><span>使用方法</span></a></li>
+<li><a href="#md:監視対象"><span>監視対象</span></a></li>
+<li><a href="#md:自動更新の仕組み"><span>自動更新の仕組み</span></a></li>
+<li><a href="#md:既存ライブラリの活用"><span>既存ライブラリの活用</span></a></li></ul></li>
+<li><a href="#md:手動品質チェック"><span>手動品質チェック</span></a></li>
+<li><a href="#md:git-hooks"><span>Git <wbr/>Hooks</span></a></li>
+<li><a href="#md:コミットメッセージの形式"><span>コミットメッセージの形式</span></a></li></ul></li>
+<li><a href="#md:building-and-publishing"><span>Building and <wbr/>Publishing</span></a></li>
+<li>
+<ul>
+<li><a href="#md:自動パッケージ化"><span>自動パッケージ化</span></a></li>
+<li><a href="#md:手動パッケージ化"><span>手動パッケージ化</span></a></li>
+<li><a href="#md:パッケージ化の自動処理"><span>パッケージ化の自動処理</span></a></li></ul></li>
+<li><a href="#md:license"><span>License</span></a></li>
+<li><a href="#md:テスト開発"><span>テスト開発</span></a></li>
+<li>
+<ul>
+<li><a href="#md:テストの実行"><span>テストの実行</span></a></li>
+<li><a href="#md:テストテンプレート"><span>テストテンプレート</span></a></li>
+<li><a href="#md:テストケースの命名規則"><span>テストケースの命名規則</span></a></li></ul></li></ul></li></ul></li></ul></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="index.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>laravel-<wbr/>blade-<wbr/>visualizer -<wbr/> v0.1.1</span></a>
+<ul class="tsd-small-nested-navigation">
+<li><a href="modules/extension.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>extension</span></a></li>
+<li><a href="modules/parsers_BladeParser.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>parsers/<wbr/>Blade<wbr/>Parser</span></a></li>
+<li><a href="modules/providers_BladeTemplateProvider.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>providers/<wbr/>Blade<wbr/>Template<wbr/>Provider</span></a></li></ul></nav></div></div></div>
+<div class="tsd-generator">
+<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
+<div class="overlay"></div></body></html>

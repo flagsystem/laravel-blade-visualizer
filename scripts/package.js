@@ -47,7 +47,11 @@ async function runCommand(command, description) {
  * @returns {boolean} パッケージファイルが存在するかどうか
  */
 function hasPackageFile() {
-    const packageFiles = fs.readdirSync('.').filter(file =>
+    const distDir = 'dist';
+    if (!fs.existsSync(distDir)) {
+        return false;
+    }
+    const packageFiles = fs.readdirSync(distDir).filter(file =>
         file.endsWith('.vsix') && file.includes('laravel-blade-visualizer')
     );
     return packageFiles.length > 0;
@@ -57,12 +61,19 @@ function hasPackageFile() {
  * 最新のパッケージファイルを削除する
  */
 function cleanupOldPackages() {
-    const packageFiles = fs.readdirSync('.').filter(file =>
+    const distDir = 'dist';
+    if (!fs.existsSync(distDir)) {
+        fs.mkdirSync(distDir, { recursive: true });
+        console.log(`📁 distディレクトリを作成しました`);
+        return;
+    }
+
+    const packageFiles = fs.readdirSync(distDir).filter(file =>
         file.endsWith('.vsix') && file.includes('laravel-blade-visualizer')
     );
 
     packageFiles.forEach(file => {
-        fs.unlinkSync(file);
+        fs.unlinkSync(path.join(distDir, file));
         console.log(`🗑️  古いパッケージファイルを削除しました: ${file}`);
     });
 }
@@ -94,7 +105,7 @@ async function packageExtension(updateVersion = false) {
     const steps = [
         { command: 'npm run compile', description: 'TypeScriptコンパイル' },
         { command: 'npm run lint', description: 'コード品質チェック' },
-        { command: 'npm test', description: 'テスト実行' }
+        { command: 'npm run test:simple', description: 'テスト実行' }
     ];
 
     for (const step of steps) {
@@ -105,8 +116,8 @@ async function packageExtension(updateVersion = false) {
         }
     }
 
-    // VSCEパッケージ化を実行
-    const packageSuccess = await runCommand('npx vsce package --yes', 'VSCEパッケージ化');
+    // VSCEパッケージ化を実行（distディレクトリに出力）
+    const packageSuccess = await runCommand('npx vsce package --out dist', 'VSCEパッケージ化');
     if (!packageSuccess) {
         console.error('❌ パッケージ化に失敗しました');
         process.exit(1);
@@ -114,10 +125,11 @@ async function packageExtension(updateVersion = false) {
 
     // パッケージファイルの確認
     if (hasPackageFile()) {
-        const packageFiles = fs.readdirSync('.').filter(file =>
+        const distDir = 'dist';
+        const packageFiles = fs.readdirSync(distDir).filter(file =>
             file.endsWith('.vsix') && file.includes('laravel-blade-visualizer')
         );
-        console.log(`📦 パッケージファイルが作成されました: ${packageFiles[0]}`);
+        console.log(`📦 パッケージファイルが作成されました: dist/${packageFiles[0]}`);
     }
 
     // バージョン更新

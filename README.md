@@ -94,9 +94,66 @@ laravel-blade-visualizer/
 - `npm run package` - Package extension with automatic yes flag
 - `npm run package:version` - Package extension and update version
 
+#### ドキュメント自動生成スクリプト
+- `npm run docs:generate` - プロジェクト構造とソースコードの説明を自動生成
+- `npm run docs:watch` - ファイル変更を監視してドキュメントを自動更新
+- `npm run docs:update` - ドキュメント生成と品質チェックを実行
+- `npm run docs:generate:enhanced` - 既存ライブラリを活用した拡張版ドキュメント生成
+- `npm run docs:watch:enhanced` - 拡張版ドキュメントの監視モード
+- `npm run docs:typedoc` - TypeDocによるAPIドキュメント生成
+- `npm run docs:jsdoc` - JSDocによるAPIドキュメント生成
+- `npm run docs:structure` - プロジェクト構造ドキュメントのみ生成
+
 ## Quality Assurance
 
 ### 自動品質チェック
+
+### ドキュメント自動生成
+
+このプロジェクトには、プロジェクト構造とソースコードの説明を自動生成する機能が組み込まれています：
+
+#### 機能
+- **プロジェクト構造の自動解析**: ディレクトリとファイルの階層構造を解析
+- **ソースコードの説明抽出**: JSDocコメントと単行コメントから説明を抽出
+- **Markdown形式でのドキュメント生成**: 読みやすい形式でドキュメントを生成
+- **ファイル変更監視**: プロジェクトファイルの変更を監視して自動更新
+- **Git hooks連携**: コミット時に自動でドキュメントを更新
+
+#### 生成されるドキュメント
+- `docs/STRUCTURE.md` - プロジェクト構造の詳細説明
+- `docs/TECHNICAL.md` - 技術資料（自動更新）
+
+#### 使用方法
+```bash
+# 一度だけドキュメントを生成
+npm run docs:generate
+
+# ファイル変更を監視して自動更新
+npm run docs:watch
+
+# ドキュメント生成と品質チェックを実行
+npm run docs:update
+```
+
+#### 監視対象
+- `src/` - TypeScriptソースコード
+- `__test__/` - テストファイル
+- `scripts/` - 開発用スクリプト
+- `docs/` - 技術資料
+- `templates/` - テンプレートファイル
+- `.github/` - CI/CD設定
+
+#### 自動更新の仕組み
+- **chokidar**: ファイル変更監視ライブラリ
+- **デバウンス機能**: 過度な更新を防止（2秒間隔）
+- **Git hooks**: コミット前の自動ドキュメント更新
+- **CI/CD連携**: 品質チェックパイプラインでの自動実行
+
+#### 既存ライブラリの活用
+- **TypeDoc**: TypeScript APIドキュメント生成
+- **JSDoc**: JavaScript APIドキュメント生成
+- **clean-jsdoc-theme**: 美しいJSDocテーマ
+- **marked**: Markdown生成ライブラリ
 
 コミット時に自動的に品質チェックが実行されます：
 
