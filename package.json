@@ -42,6 +42,7 @@
         "test:create": "node scripts/test-watch.js --create-only",
         "test:unit": "mocha __test__/**/*.test.ts --require ts-node/register",
         "test:simple": "node scripts/simple-test.js",
+        "test:full": "npm run test:simple && npm run test:unit",
         "package": "node scripts/package.js",
         "package:version": "node scripts/package.js --version",
         "prepackage": "npm run compile && npm run lint && npm run test:simple",

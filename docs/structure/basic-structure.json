@@ -1,0 +1,12 @@
+{
+  "lastUpdated": "2025-07-31T06:11:43.850Z",
+  "projectName": "Laravel Blade Visualizer",
+  "version": "0.1.1",
+  "directories": [
+    "src/",
+    "__test__/",
+    "docs/",
+    "scripts/",
+    "templates/"
+  ]
+}

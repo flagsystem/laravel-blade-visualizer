@@ -1,22 +1,51 @@
 #!/bin/sh
 
-# 軽量ドキュメント自動更新
-echo "📚 軽量ドキュメントを自動更新中..."
-npm run docs:generate:light
+echo "🚀 コミット前の品質チェックを開始します..."
 
-# コミット前の品質チェックを実行
-echo "🔍 静的解析とテストを実行中..."
-npm run precommit
+# 環境変数でテストレベルを制御
+# FULL_TEST=1 で詳細テストを実行
+FULL_TEST=${FULL_TEST:-0}
 
-# 品質チェックが成功した場合のみコミットを許可
-if [ $? -eq 0 ]; then
-    echo "✅ 品質チェックが完了しました。コミットを続行します。"
-    exit 0
-else
-    echo "❌ 品質チェックが失敗しました。コミットを中止します。"
-    echo "以下のコマンドで問題を修正してください："
-    echo "  npm run lint:fix    # リントエラーを自動修正"
-    echo "  npm run compile     # コンパイルエラーを修正"
-    echo "  npm run test:simple # テストを実行"
+# 1. TypeScriptコンパイル
+echo "🔍 TypeScriptコンパイルを実行中..."
+npm run compile
+if [ $? -ne 0 ]; then
+    echo "❌ TypeScriptコンパイルが失敗しました。コミットを中止します。"
     exit 1
 fi
+
+# 2. ESLint静的解析
+echo "🔍 ESLint静的解析を実行中..."
+npm run lint
+if [ $? -ne 0 ]; then
+    echo "❌ ESLint静的解析が失敗しました。コミットを中止します。"
+    echo "以下のコマンドで自動修正を試してください："
+    echo "  npm run lint:fix"
+    exit 1
+fi
+
+# 3. ユニットテスト実行
+if [ "$FULL_TEST" = "1" ]; then
+    echo "🧪 詳細テストを実行中..."
+    npm run test:full
+else
+    echo "🧪 基本テストを実行中..."
+    npm run test:simple
+fi
+
+if [ $? -ne 0 ]; then
+    echo "❌ テストが失敗しました。コミットを中止します。"
+    echo "詳細テストを実行する場合は: FULL_TEST=1 git commit"
+    echo "テストを修正してから再度コミットしてください。"
+    exit 1
+fi
+
+# 4. 軽量ドキュメント自動更新
+echo "📚 軽量ドキュメントを自動更新中..."
+npm run docs:generate:light
+if [ $? -ne 0 ]; then
+    echo "⚠️  ドキュメント更新でエラーが発生しましたが、コミットを継続します。"
+fi
+
+echo "✅ すべての品質チェックが完了しました。コミットを続行します。"
+exit 0
