@@ -21,19 +21,18 @@ laravel-blade-visualizer/
   - `package-lock.json` - npm依存関係ロックファイル
   - `package.json` - npm設定ファイル
   - `tsconfig.json` - TypeScript設定
-  - **.cache/** - キャッシュファイル
-    - 目的: プロジェクト構造のキャッシュとドキュメント生成設定
-    - `project-structure.json` - プロジェクト構造定義
+  - **.cache/**
+    - `project-structure.json` - 設定ファイル
   - **.devcontainer/** - 開発コンテナ設定
     - 目的: Docker環境での開発サポート
-    - `devcontainer.json` - 設定ファイル
+    - `devcontainer.json` - 開発コンテナ設定 (設定ファイル)
   - **.github/**
     - **workflows/**
       - `ci.yml` - YAML設定ファイル
   - **.husky/** - Git hooks
     - 目的: コミット前の品質チェック自動化
-    - `commit-msg` - コミットメッセージ形式チェック
-    - `pre-commit` - コミット前品質チェック
+    - `commit-msg` - Git hooks (ファイル)
+    - `pre-commit` - Git hooks (ファイル)
     - **_/**
       - `.gitignore` - Git除外設定
       - `applypatch-msg` - ファイル
@@ -54,9 +53,9 @@ laravel-blade-visualizer/
       - `prepare-commit-msg` - ファイル
   - **__test__/** - テストファイル
     - 目的: ユニットテストと統合テスト
-    - `extension.test.js` - JavaScriptファイル
-    - `extension.test.js.map` - ファイル
-    - `extension.test.ts` - メイン拡張機能のテスト
+    - `extension.test.js` - テストファイル (JavaScriptファイル)
+    - `extension.test.js.map` - テストファイル (ファイル)
+    - `extension.test.ts` - テストファイル (TypeScriptファイル)
     - **mocks/**
       - `vscode.js` - JavaScriptファイル
     - **parsers/**
@@ -67,14 +66,13 @@ laravel-blade-visualizer/
       - `BladeTemplateProvider.test.js` - JavaScriptファイル
       - `BladeTemplateProvider.test.js.map` - ファイル
       - `BladeTemplateProvider.test.ts` - TypeScriptソースファイル
-  - **dist/** - ビルド成果物
-    - 目的: VSCode拡張機能パッケージ（.vsix）
+  - **dist/**
     - `laravel-blade-visualizer-0.1.1.vsix` - ファイル
   - **docs/** - 技術資料
     - 目的: プロジェクトの技術仕様と開発ガイド
-    - `STRUCTURE.md` - プロジェクト構造説明（自動生成）
-    - `TECHNICAL.md` - 技術仕様書
-    - `index.md` - ドキュメントインデックス（自動生成）
+    - `STRUCTURE.md` - ドキュメント (ドキュメントファイル)
+    - `TECHNICAL.md` - ドキュメント (ドキュメントファイル)
+    - `index.md` - ドキュメント (ドキュメントファイル)
     - **api/**
       - `.nojekyll` - ファイル
       - `index.html` - ファイル
@@ -98,91 +96,36 @@ laravel-blade-visualizer/
         - `providers_BladeTemplateProvider.html` - ファイル
   - **scripts/** - 開発用スクリプト
     - 目的: ビルド、テスト、パッケージ化の自動化
-    - `config-manager.js` - 設定管理スクリプト
-    - `docs-generator.js` - ドキュメント自動生成スクリプト
-    - `package.js` - パッケージ化スクリプト
-    - `quality-check.js` - 品質チェックスクリプト
-    - `simple-test.js` - 簡単なテストスクリプト
-    - `test-watch.js` - テスト監視スクリプト
+    - `config-manager.js` - 開発スクリプト (JavaScriptファイル)
+    - `docs-generator.js` - 開発スクリプト (JavaScriptファイル)
+    - `package.js` - 開発スクリプト (JavaScriptファイル)
+    - `quality-check.js` - 開発スクリプト (JavaScriptファイル)
+    - `simple-test.js` - 開発スクリプト (JavaScriptファイル)
+    - `structure-analyzer.js` - 開発スクリプト (JavaScriptファイル)
+    - `test-watch.js` - 開発スクリプト (JavaScriptファイル)
   - **src/** - TypeScriptソースコード
-    - 目的: VSCode拡張機能のメインロジック
-    - `extension.ts` - 拡張機能のエントリーポイント
+    - 目的: メインアプリケーションのソースコード
+    - `extension.ts` - ソースコード (TypeScriptファイル)
     - **parsers/**
       - `BladeParser.ts` - TypeScriptソースファイル
     - **providers/**
       - `BladeTemplateProvider.ts` - TypeScriptソースファイル
   - **templates/** - テンプレートファイル
     - 目的: プロジェクト生成用テンプレート
-    - `test-template.ts` - TypeScriptソースファイル
+    - `test-template.ts` - テンプレート (TypeScriptファイル)
 
 
 ## ディレクトリ詳細
 
-### `src/`
+### `.devcontainer/`
 
-**説明:** TypeScriptソースコード
+**説明:** 開発コンテナ設定
 
-**目的:** VSCode拡張機能のメインロジック
-
-**主要ファイル:**
-
-- `extension.ts` - 拡張機能のエントリーポイント
-- `parsers/` - Bladeテンプレート解析ロジック
-- `providers/` - VSCodeツリービュープロバイダー
-
----
-
-### `__test__/`
-
-**説明:** テストファイル
-
-**目的:** ユニットテストと統合テスト
+**目的:** Docker環境での開発サポート
 
 **主要ファイル:**
 
-- `extension.test.ts` - メイン拡張機能のテスト
-- `parsers/` - パーサーのテスト
-- `providers/` - プロバイダーのテスト
-- `mocks/` - テスト用モックファイル
-
----
-
-### `scripts/`
-
-**説明:** 開発用スクリプト
-
-**目的:** ビルド、テスト、パッケージ化の自動化
-
-**主要ファイル:**
-
-- `package.js` - パッケージ化スクリプト
-- `quality-check.js` - 品質チェックスクリプト
-- `simple-test.js` - 簡単なテストスクリプト
-- `test-watch.js` - テスト監視スクリプト
-- `docs-generator.js` - ドキュメント自動生成スクリプト
-- `config-manager.js` - 設定管理スクリプト
-
----
-
-### `docs/`
-
-**説明:** 技術資料
-
-**目的:** プロジェクトの技術仕様と開発ガイド
-
-**主要ファイル:**
-
-- `TECHNICAL.md` - 技術仕様書
-- `STRUCTURE.md` - プロジェクト構造説明（自動生成）
-- `index.md` - ドキュメントインデックス（自動生成）
-
----
-
-### `dist/`
-
-**説明:** ビルド成果物
-
-**目的:** VSCode拡張機能パッケージ（.vsix）
+- `devcontainer.json` - 開発コンテナ設定 (設定ファイル)
 
 ---
 
@@ -194,20 +137,91 @@ laravel-blade-visualizer/
 
 **主要ファイル:**
 
-- `pre-commit` - コミット前品質チェック
-- `commit-msg` - コミットメッセージ形式チェック
+- `_/` - _関連のファイル
+- `commit-msg` - Git hooks (ファイル)
+- `pre-commit` - Git hooks (ファイル)
 
 ---
 
-### `.github/workflows/`
+### `__test__/`
 
-**説明:** CI/CD設定
+**説明:** テストファイル
 
-**目的:** GitHub Actionsによる自動テスト・デプロイ
+**目的:** ユニットテストと統合テスト
 
 **主要ファイル:**
 
-- `ci.yml` - CI/CDパイプライン設定
+- `extension.test.js` - テストファイル (JavaScriptファイル)
+- `extension.test.js.map` - テストファイル (ファイル)
+- `extension.test.ts` - テストファイル (TypeScriptファイル)
+- `mocks/` - mocks関連のファイル
+- `parsers/` - parsers関連のファイル
+- `providers/` - providers関連のファイル
+
+---
+
+### `docs/`
+
+**説明:** 技術資料
+
+**目的:** プロジェクトの技術仕様と開発ガイド
+
+**主要ファイル:**
+
+- `STRUCTURE.md` - ドキュメント (ドキュメントファイル)
+- `TECHNICAL.md` - ドキュメント (ドキュメントファイル)
+- `api/` - api関連のファイル
+- `index.md` - ドキュメント (ドキュメントファイル)
+
+---
+
+### `out/`
+
+**説明:** 出力ファイル
+
+**目的:** コンパイル済みファイル
+
+**主要ファイル:**
+
+- `extension.js` - JavaScriptファイル
+- `extension.js.map` - ファイル
+- `extension.test.js` - JavaScriptファイル
+- `extension.test.js.map` - ファイル
+- `parsers/` - parsers関連のファイル
+- `providers/` - providers関連のファイル
+- `test/` - test関連のファイル
+
+---
+
+### `scripts/`
+
+**説明:** 開発用スクリプト
+
+**目的:** ビルド、テスト、パッケージ化の自動化
+
+**主要ファイル:**
+
+- `config-manager.js` - 開発スクリプト (JavaScriptファイル)
+- `docs-generator.js` - 開発スクリプト (JavaScriptファイル)
+- `package.js` - 開発スクリプト (JavaScriptファイル)
+- `quality-check.js` - 開発スクリプト (JavaScriptファイル)
+- `simple-test.js` - 開発スクリプト (JavaScriptファイル)
+- `structure-analyzer.js` - 開発スクリプト (JavaScriptファイル)
+- `test-watch.js` - 開発スクリプト (JavaScriptファイル)
+
+---
+
+### `src/`
+
+**説明:** TypeScriptソースコード
+
+**目的:** メインアプリケーションのソースコード
+
+**主要ファイル:**
+
+- `extension.ts` - ソースコード (TypeScriptファイル)
+- `parsers/` - parsers関連のファイル
+- `providers/` - providers関連のファイル
 
 ---
 
@@ -217,25 +231,9 @@ laravel-blade-visualizer/
 
 **目的:** プロジェクト生成用テンプレート
 
----
-
-### `.devcontainer/`
-
-**説明:** 開発コンテナ設定
-
-**目的:** Docker環境での開発サポート
-
----
-
-### `.cache/`
-
-**説明:** キャッシュファイル
-
-**目的:** プロジェクト構造のキャッシュとドキュメント生成設定
-
 **主要ファイル:**
 
-- `project-structure.json` - プロジェクト構造定義
+- `test-template.ts` - テンプレート (TypeScriptファイル)
 
 ---
 
@@ -356,7 +354,7 @@ laravel-blade-visualizer/
 
 ## 自動生成情報
 
-- **生成日時:** 2025/7/31 5:59:10
+- **生成日時:** 2025/7/31 6:05:36
 - **生成スクリプト:** `scripts/docs-generator.js`
 - **更新方法:** `npm run docs:generate`
 
