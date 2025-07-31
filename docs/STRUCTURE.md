@@ -21,8 +21,9 @@ laravel-blade-visualizer/
   - `package-lock.json` - npm依存関係ロックファイル
   - `package.json` - npm設定ファイル
   - `tsconfig.json` - TypeScript設定
-  - **.cache/**
-    - `project-structure.json` - 設定ファイル
+  - **.cache/** - キャッシュファイル
+    - 目的: プロジェクト構造のキャッシュとドキュメント生成設定
+    - `project-structure.json` - プロジェクト構造定義
   - **.devcontainer/** - 開発コンテナ設定
     - 目的: Docker環境での開発サポート
     - `devcontainer.json` - 設定ファイル
@@ -226,11 +227,11 @@ laravel-blade-visualizer/
 
 ---
 
-### `config/`
+### `.cache/`
 
-**説明:** 設定ファイル
+**説明:** キャッシュファイル
 
-**目的:** プロジェクト設定とドキュメント生成設定
+**目的:** プロジェクト構造のキャッシュとドキュメント生成設定
 
 **主要ファイル:**
 
@@ -355,7 +356,7 @@ laravel-blade-visualizer/
 
 ## 自動生成情報
 
-- **生成日時:** 2025/7/31 5:58:49
+- **生成日時:** 2025/7/31 5:59:10
 - **生成スクリプト:** `scripts/docs-generator.js`
 - **更新方法:** `npm run docs:generate`
 

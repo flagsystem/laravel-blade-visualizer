@@ -59,6 +59,7 @@
         "config:backup": "node scripts/config-manager.js backup",
         "config:restore": "node scripts/config-manager.js restore",
         "config:status": "node scripts/config-manager.js status",
+        "structure:analyze": "node scripts/structure-analyzer.js analyze",
         "prepare": "husky"
     },
     "devDependencies": {
