@@ -2,7 +2,7 @@
 
 A Cursor extension that visualizes parent-child relationships in Laravel Blade template files.
 
-<!-- Last Updated: 2025/7/31 15:43:09 -->
+<!-- Last Updated: 2025/7/31 15:44:44 -->
 
 ## Features
 
@@ -224,6 +224,24 @@ perf: パフォーマンスの改善
    - ✅ **Allow GitHub Actions to create and approve pull requests**
 
 これにより、GitHub Actionsがリリースを作成できるようになります。
+
+### CI/CDパイプラインの詳細
+
+#### **自動実行ワークフロー（ci.yml）**
+- **品質チェック**: TypeScriptコンパイル、ESLint、ユニットテスト
+- **パッケージ作成**: VSIXファイルの生成とアーティファクト保存
+- **リリース作成**: GitHub Releasesへの自動アップロード
+
+#### **手動実行ワークフロー（release.yml）**
+- **手動リリース**: 任意のバージョンでリリースを作成
+- **プレリリース対応**: プレリリースとして公開可能
+- **エラーハンドリング**: 重複タグの検出と適切なエラー処理
+
+#### **権限の詳細説明**
+- **contents: write**: リリース、タグ、ブランチの作成・更新
+- **packages: write**: VSIXファイルのアップロード
+- **issues: write**: リリースノートの自動生成
+- **pull-requests: write**: 自動化されたPR作成
 
 ### インストール方法
 

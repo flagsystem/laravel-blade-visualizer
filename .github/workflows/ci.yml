@@ -1,5 +1,7 @@
 name: CI/CD Pipeline
 
+# ワークフローの実行条件
+# mainブランチとdevelopブランチへのプッシュ、およびプルリクエスト時に実行
 on:
   push:
     branches: [ main, develop ]
@@ -7,85 +9,127 @@ on:
     branches: [ main, develop ]
 
 # ワークフロー全体の権限設定
+# GitHub Actionsがリポジトリに対して実行できる操作を定義
 permissions:
+  # contents: write - リリース、タグ、ブランチの作成・更新権限
+  # リリース作成時に必要
   contents: write
+  # packages: write - パッケージ（VSIXファイル）のアップロード権限
+  # VSCode拡張機能の配布に必要
   packages: write
+  # issues: write - イシューの作成・更新権限
+  # リリースノートの自動生成時に必要
   issues: write
+  # pull-requests: write - プルリクエストの作成・更新権限
+  # 自動化されたPR作成時に必要
   pull-requests: write
 
 jobs:
+  # 品質チェックジョブ
+  # コードの品質を保証するための静的解析とテストを実行
   quality-check:
     name: 品質チェック
     runs-on: ubuntu-latest
     
     steps:
+    # リポジトリのコードをチェックアウト
     - name: リポジトリをチェックアウト
       uses: actions/checkout@v4
 
+    # Node.js環境のセットアップ
+    # VSCode拡張機能の開発に必要なNode.js 22をインストール
     - name: Node.jsをセットアップ
       uses: actions/setup-node@v4
       with:
         node-version: '22'
         cache: 'npm'
 
+    # 依存関係のインストール
+    # package.jsonに記載されたnpmパッケージをインストール
     - name: 依存関係をインストール
       run: npm ci
 
+    # TypeScriptのコンパイル
+    # TypeScriptコードをJavaScriptに変換し、型エラーをチェック
     - name: TypeScriptコンパイル
       run: npm run compile
 
+    # ESLintによる静的解析
+    # コードの品質とスタイルをチェック
     - name: ESLint静的解析
       run: npm run lint
 
+    # ユニットテストの実行
+    # 基本的な機能テストを実行して動作を確認
     - name: ユニットテスト実行
       run: npm run test:simple
 
+    # 総合的な品質チェック
+    # コンパイル、リント、テストを一括で実行
     - name: 品質チェック
       run: npm run quality
 
+  # パッケージ作成ジョブ
+  # VSCode拡張機能のVSIXファイルを作成
+  # mainブランチへのプッシュ時のみ実行
   package:
     name: パッケージ作成
     runs-on: ubuntu-latest
-    needs: quality-check
+    needs: quality-check  # 品質チェックが成功した後に実行
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
+    # リポジトリのコードをチェックアウト
     - name: リポジトリをチェックアウト
       uses: actions/checkout@v4
 
+    # Node.js環境のセットアップ
     - name: Node.jsをセットアップ
       uses: actions/setup-node@v4
       with:
         node-version: '22'
         cache: 'npm'
 
+    # 依存関係のインストール
     - name: 依存関係をインストール
       run: npm ci
 
+    # VSCode拡張機能のパッケージ化
+    # TypeScriptをコンパイルしてVSIXファイルを作成
     - name: 拡張機能をパッケージ化
       run: npm run package
 
+    # パッケージファイルをアーティファクトとして保存
+    # 後続のリリースジョブで使用するため
     - name: パッケージをアーティファクトとしてアップロード
       uses: actions/upload-artifact@v4
       with:
         name: laravel-blade-visualizer
         path: dist/laravel-blade-visualizer-*.vsix
-        retention-days: 30
+        retention-days: 30  # 30日間保存
 
+  # リリース作成ジョブ
+  # GitHub ReleasesにVSIXファイルをアップロード
+  # mainブランチへのプッシュ時のみ実行
   release:
     name: リリース作成
     runs-on: ubuntu-latest
-    needs: package
+    needs: package  # パッケージ作成が成功した後に実行
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
+    # リポジトリのコードをチェックアウト
     - name: リポジトリをチェックアウト
       uses: actions/checkout@v4
 
+    # package.jsonからバージョン情報を取得
+    # リリースタグの名前として使用
     - name: バージョン情報を取得
       id: get-version
       run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
+    # 既存のタグをチェック
+    # 同じバージョンのタグが既に存在する場合はリリースをスキップ
     - name: 既存のタグをチェック
       id: check-tag
       run: |
@@ -95,25 +139,31 @@ jobs:
           echo "tag_exists=false" >> $GITHUB_OUTPUT
         fi
 
+    # パッケージファイルをダウンロード
+    # packageジョブで作成されたVSIXファイルを取得
     - name: パッケージファイルをダウンロード
       uses: actions/download-artifact@v4
       with:
         name: laravel-blade-visualizer
         path: dist/
 
+    # GitHub Releasesにリリースを作成
+    # 既存のタグが存在しない場合のみ実行
     - name: リリースを作成
       uses: softprops/action-gh-release@v1
       if: steps.check-tag.outputs.tag_exists == 'false'
       with:
-        files: dist/laravel-blade-visualizer-*.vsix
-        generate_release_notes: true
-        draft: false
-        prerelease: false
-        tag_name: v${{ steps.get-version.outputs.version }}
-        name: Release v${{ steps.get-version.outputs.version }}
+        files: dist/laravel-blade-visualizer-*.vsix  # アップロードするファイル
+        generate_release_notes: true  # 自動的にリリースノートを生成
+        draft: false  # 下書きではなく公開リリース
+        prerelease: false  # プレリリースではなく正式リリース
+        tag_name: v${{ steps.get-version.outputs.version }}  # タグ名（例: v0.1.2）
+        name: Release v${{ steps.get-version.outputs.version }}  # リリース名
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub API認証トークン
 
+    # タグが既に存在する場合のメッセージ
+    # エラーではなく警告として表示
     - name: タグが既に存在する場合のメッセージ
       if: steps.check-tag.outputs.tag_exists == 'true'
       run: |

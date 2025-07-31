@@ -1,5 +1,7 @@
 name: Manual Release
 
+# 手動実行のワークフロー
+# GitHub ActionsのUIから手動で実行可能
 on:
   workflow_dispatch:
     inputs:
@@ -14,45 +16,73 @@ on:
         default: false
 
 # ワークフロー全体の権限設定
+# GitHub Actionsがリポジトリに対して実行できる操作を定義
 permissions:
+  # contents: write - リリース、タグ、ブランチの作成・更新権限
+  # リリース作成時に必要
   contents: write
+  # packages: write - パッケージ（VSIXファイル）のアップロード権限
+  # VSCode拡張機能の配布に必要
   packages: write
+  # issues: write - イシューの作成・更新権限
+  # リリースノートの自動生成時に必要
   issues: write
+  # pull-requests: write - プルリクエストの作成・更新権限
+  # 自動化されたPR作成時に必要
   pull-requests: write
 
 jobs:
+  # 手動リリース作成ジョブ
+  # 指定されたバージョンでリリースを作成
   release:
     name: 手動リリース作成
     runs-on: ubuntu-latest
     
     steps:
+    # リポジトリのコードをチェックアウト
     - name: リポジトリをチェックアウト
       uses: actions/checkout@v4
 
+    # Node.js環境のセットアップ
+    # VSCode拡張機能の開発に必要なNode.js 22をインストール
     - name: Node.jsをセットアップ
       uses: actions/setup-node@v4
       with:
         node-version: '22'
         cache: 'npm'
 
+    # 依存関係のインストール
+    # package.jsonに記載されたnpmパッケージをインストール
     - name: 依存関係をインストール
       run: npm ci
 
+    # TypeScriptのコンパイル
+    # TypeScriptコードをJavaScriptに変換し、型エラーをチェック
     - name: TypeScriptコンパイル
       run: npm run compile
 
+    # ESLintによる静的解析
+    # コードの品質とスタイルをチェック
     - name: ESLint静的解析
       run: npm run lint
 
+    # ユニットテストの実行
+    # 基本的な機能テストを実行して動作を確認
     - name: ユニットテスト実行
       run: npm run test:simple
 
+    # 総合的な品質チェック
+    # コンパイル、リント、テストを一括で実行
     - name: 品質チェック
       run: npm run quality
 
+    # VSCode拡張機能のパッケージ化
+    # TypeScriptをコンパイルしてVSIXファイルを作成
     - name: 拡張機能をパッケージ化
       run: npm run package
 
+    # 既存のタグをチェック
+    # 同じバージョンのタグが既に存在する場合はエラーで停止
     - name: 既存のタグをチェック
       id: check-tag
       run: |
@@ -62,19 +92,23 @@ jobs:
           echo "tag_exists=false" >> $GITHUB_OUTPUT
         fi
 
+    # GitHub Releasesにリリースを作成
+    # 既存のタグが存在しない場合のみ実行
     - name: リリースを作成
       uses: softprops/action-gh-release@v1
       if: steps.check-tag.outputs.tag_exists == 'false'
       with:
-        files: dist/laravel-blade-visualizer-*.vsix
-        generate_release_notes: true
-        draft: false
-        prerelease: ${{ github.event.inputs.prerelease }}
-        tag_name: v${{ github.event.inputs.version }}
-        name: Release v${{ github.event.inputs.version }}
+        files: dist/laravel-blade-visualizer-*.vsix  # アップロードするファイル
+        generate_release_notes: true  # 自動的にリリースノートを生成
+        draft: false  # 下書きではなく公開リリース
+        prerelease: ${{ github.event.inputs.prerelease }}  # 手動入力に基づくプレリリース設定
+        tag_name: v${{ github.event.inputs.version }}  # 手動入力のバージョンでタグ作成
+        name: Release v${{ github.event.inputs.version }}  # リリース名
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub API認証トークン
 
+    # タグが既に存在する場合のエラー処理
+    # 手動実行ではエラーとして停止
     - name: タグが既に存在する場合のエラー
       if: steps.check-tag.outputs.tag_exists == 'true'
       run: |
