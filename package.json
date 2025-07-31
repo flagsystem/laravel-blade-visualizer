@@ -2,7 +2,7 @@
     "name": "laravel-blade-visualizer",
     "displayName": "Laravel Blade Visualizer",
     "description": "Visualize parent-child relationships in Laravel Blade template files",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "engines": {
         "vscode": "^1.74.0"
     },
@@ -36,22 +36,31 @@
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile && npm run lint",
         "lint": "eslint src --ext ts",
-        "test": "node ./out/test/runTest.js"
+        "test": "node ./out/test/runTest.js",
+        "test:watch": "node scripts/test-watch.js",
+        "test:create": "node scripts/test-watch.js --create-only",
+        "package": "node scripts/package.js",
+        "package:version": "node scripts/package.js --version",
+        "prepackage": "npm run compile && npm run lint && npm test"
     },
     "devDependencies": {
-        "@types/vscode": "^1.74.0",
+        "@types/mocha": "^10.0.10",
         "@types/node": "16.x",
+        "@types/vscode": "^1.74.0",
         "@typescript-eslint/eslint-plugin": "^5.42.0",
         "@typescript-eslint/parser": "^5.42.0",
+        "@vscode/test-electron": "^2.5.2",
         "eslint": "^8.26.0",
-        "typescript": "^4.8.4"
+        "glob": "^11.0.3",
+        "mocha": "^11.7.1",
+        "typescript": "^4.8.4",
+        "vsce": "^2.15.0"
     },
-    "dependencies": {},
     "repository": {
         "type": "git",
         "url": "https://github.com/yourusername/laravel-blade-visualizer.git"
     },
-    "publisher": "your-publisher-name",
+    "publisher": "ueda",
     "keywords": [
         "laravel",
         "blade",

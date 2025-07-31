@@ -14,7 +14,10 @@
                 "ms-vscode.vscode-github",
                 "ms-vscode.vscode-markdown",
                 "ms-vscode.vscode-yaml",
-                "ms-vscode.vscode-docker"
+                "ms-vscode.vscode-docker",
+                "shd101wyy.markdown-preview-enhanced",
+                "dbaeumer.vscode-eslint",
+                "christian-kohler.path-intellisense",
             ],
             "settings": {
                 "typescript.preferences.includePackageJsonAutoImports": "on",

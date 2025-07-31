@@ -13,11 +13,13 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "types": [
-            "node"
+            "node",
+            "mocha"
         ]
     },
     "exclude": [
         "node_modules",
-        ".vscode-test"
+        ".vscode-test",
+        "templates"
     ]
 }
