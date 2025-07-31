@@ -102,6 +102,12 @@ laravel-blade-visualizer/
 - `npm run docs:jsdoc` - JSDocによるAPIドキュメント生成
 - `npm run docs:structure` - プロジェクト構造ドキュメントのみ生成
 
+#### 設定管理スクリプト
+- `npm run config:validate` - 設定ファイルの検証
+- `npm run config:backup` - 設定ファイルのバックアップ
+- `npm run config:restore` - 設定ファイルの復元
+- `npm run config:status` - 設定ファイルの状態表示
+
 ## Quality Assurance
 
 ### 自動品質チェック
@@ -135,9 +141,10 @@ npm run docs:jsdoc      # JSDocのみ
 ```
 
 #### 自動更新対象
-- **コミット時**: 全ドキュメントの自動生成
+- **コミット時**: 全ドキュメントの自動生成（設定ファイルから読み込み）
 - **CI/CD時**: 品質チェックとドキュメント生成
 - **手動時**: 個別ドキュメントの生成
+- **設定変更時**: 設定ファイルの更新でドキュメント構造を変更
 
 #### 自動更新の仕組み
 - **Git hooks**: コミット前の自動ドキュメント更新

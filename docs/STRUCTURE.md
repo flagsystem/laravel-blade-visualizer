@@ -64,6 +64,9 @@ laravel-blade-visualizer/
       - `BladeTemplateProvider.test.js` - JavaScriptファイル
       - `BladeTemplateProvider.test.js.map` - ファイル
       - `BladeTemplateProvider.test.ts` - TypeScriptソースファイル
+  - **config/** - 設定ファイル
+    - 目的: プロジェクト設定とドキュメント生成設定
+    - `project-structure.json` - プロジェクト構造定義
   - **dist/** - ビルド成果物
     - 目的: VSCode拡張機能パッケージ（.vsix）
     - `laravel-blade-visualizer-0.1.1.vsix` - ファイル
@@ -71,7 +74,7 @@ laravel-blade-visualizer/
     - 目的: プロジェクトの技術仕様と開発ガイド
     - `STRUCTURE.md` - プロジェクト構造説明（自動生成）
     - `TECHNICAL.md` - 技術仕様書
-    - `index.md` - Markdownドキュメント
+    - `index.md` - ドキュメントインデックス（自動生成）
     - **api/**
       - `.nojekyll` - ファイル
       - `index.html` - ファイル
@@ -95,6 +98,7 @@ laravel-blade-visualizer/
         - `providers_BladeTemplateProvider.html` - ファイル
   - **scripts/** - 開発用スクリプト
     - 目的: ビルド、テスト、パッケージ化の自動化
+    - `config-manager.js` - JavaScriptファイル
     - `docs-generator.js` - ドキュメント自動生成スクリプト
     - `package.js` - パッケージ化スクリプト
     - `quality-check.js` - 品質チェックスクリプト
@@ -156,7 +160,6 @@ laravel-blade-visualizer/
 - `simple-test.js` - 簡単なテストスクリプト
 - `test-watch.js` - テスト監視スクリプト
 - `docs-generator.js` - ドキュメント自動生成スクリプト
-- `docs-watcher.js` - ドキュメント監視スクリプト
 
 ---
 
@@ -170,6 +173,7 @@ laravel-blade-visualizer/
 
 - `TECHNICAL.md` - 技術仕様書
 - `STRUCTURE.md` - プロジェクト構造説明（自動生成）
+- `index.md` - ドキュメントインデックス（自動生成）
 
 ---
 
@@ -219,6 +223,18 @@ laravel-blade-visualizer/
 **説明:** 開発コンテナ設定
 
 **目的:** Docker環境での開発サポート
+
+---
+
+### `config/`
+
+**説明:** 設定ファイル
+
+**目的:** プロジェクト設定とドキュメント生成設定
+
+**主要ファイル:**
+
+- `project-structure.json` - プロジェクト構造定義
 
 ---
 
@@ -339,7 +355,7 @@ laravel-blade-visualizer/
 
 ## 自動生成情報
 
-- **生成日時:** 2025/7/31 5:40:37
+- **生成日時:** 2025/7/31 5:44:44
 - **生成スクリプト:** `scripts/docs-generator.js`
 - **更新方法:** `npm run docs:generate`
 

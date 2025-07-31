@@ -54,6 +54,10 @@
         "docs:typedoc": "npx typedoc --out docs/api --excludePrivate --excludeProtected --excludeExternals --includeVersion --readme README.md src/",
         "docs:jsdoc": "npx jsdoc --destination docs/js-api --template node_modules/clean-jsdoc-theme --configure jsdoc.json src/",
         "docs:structure": "node scripts/docs-generator.js",
+        "config:validate": "node scripts/config-manager.js validate",
+        "config:backup": "node scripts/config-manager.js backup",
+        "config:restore": "node scripts/config-manager.js restore",
+        "config:status": "node scripts/config-manager.js status",
         "prepare": "husky"
     },
     "devDependencies": {

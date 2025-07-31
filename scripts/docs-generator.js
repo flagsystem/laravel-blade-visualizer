@@ -17,80 +17,111 @@ const glob = require('glob');
 const { execSync } = require('child_process');
 
 /**
- * プロジェクト構造の定義
- * 各ディレクトリの役割と説明を定義
+ * プロジェクト構造設定を読み込み
+ * @returns {Object} プロジェクト構造設定
  */
-const PROJECT_STRUCTURE = {
-    'src': {
-        description: 'TypeScriptソースコード',
-        purpose: 'VSCode拡張機能のメインロジック',
-        files: {
-            'extension.ts': '拡張機能のエントリーポイント',
-            'parsers/': 'Bladeテンプレート解析ロジック',
-            'providers/': 'VSCodeツリービュープロバイダー'
+function loadProjectStructure() {
+    try {
+        const configPath = path.join('config', 'project-structure.json');
+        if (fs.existsSync(configPath)) {
+            const configData = fs.readFileSync(configPath, 'utf8');
+            return JSON.parse(configData);
+        } else {
+            console.warn('⚠️ 設定ファイルが見つかりません: config/project-structure.json');
+            console.warn('   デフォルト設定を使用します');
+            return getDefaultProjectStructure();
         }
-    },
-    '__test__': {
-        description: 'テストファイル',
-        purpose: 'ユニットテストと統合テスト',
-        files: {
-            'extension.test.ts': 'メイン拡張機能のテスト',
-            'parsers/': 'パーサーのテスト',
-            'providers/': 'プロバイダーのテスト',
-            'mocks/': 'テスト用モックファイル'
-        }
-    },
-    'scripts': {
-        description: '開発用スクリプト',
-        purpose: 'ビルド、テスト、パッケージ化の自動化',
-        files: {
-            'package.js': 'パッケージ化スクリプト',
-            'quality-check.js': '品質チェックスクリプト',
-            'simple-test.js': '簡単なテストスクリプト',
-            'test-watch.js': 'テスト監視スクリプト',
-            'docs-generator.js': 'ドキュメント自動生成スクリプト',
-            'docs-watcher.js': 'ドキュメント監視スクリプト'
-        }
-    },
-    'docs': {
-        description: '技術資料',
-        purpose: 'プロジェクトの技術仕様と開発ガイド',
-        files: {
-            'TECHNICAL.md': '技術仕様書',
-            'STRUCTURE.md': 'プロジェクト構造説明（自動生成）'
-        }
-    },
-    'dist': {
-        description: 'ビルド成果物',
-        purpose: 'VSCode拡張機能パッケージ（.vsix）',
-        files: {}
-    },
-    '.husky': {
-        description: 'Git hooks',
-        purpose: 'コミット前の品質チェック自動化',
-        files: {
-            'pre-commit': 'コミット前品質チェック',
-            'commit-msg': 'コミットメッセージ形式チェック'
-        }
-    },
-    '.github/workflows': {
-        description: 'CI/CD設定',
-        purpose: 'GitHub Actionsによる自動テスト・デプロイ',
-        files: {
-            'ci.yml': 'CI/CDパイプライン設定'
-        }
-    },
-    'templates': {
-        description: 'テンプレートファイル',
-        purpose: 'プロジェクト生成用テンプレート',
-        files: {}
-    },
-    '.devcontainer': {
-        description: '開発コンテナ設定',
-        purpose: 'Docker環境での開発サポート',
-        files: {}
+    } catch (error) {
+        console.error('❌ 設定ファイルの読み込みに失敗しました:', error.message);
+        console.warn('   デフォルト設定を使用します');
+        return getDefaultProjectStructure();
     }
-};
+}
+
+/**
+ * デフォルトのプロジェクト構造設定
+ * @returns {Object} デフォルト設定
+ */
+function getDefaultProjectStructure() {
+    return {
+        'src': {
+            description: 'TypeScriptソースコード',
+            purpose: 'VSCode拡張機能のメインロジック',
+            files: {
+                'extension.ts': '拡張機能のエントリーポイント',
+                'parsers/': 'Bladeテンプレート解析ロジック',
+                'providers/': 'VSCodeツリービュープロバイダー'
+            }
+        },
+        '__test__': {
+            description: 'テストファイル',
+            purpose: 'ユニットテストと統合テスト',
+            files: {
+                'extension.test.ts': 'メイン拡張機能のテスト',
+                'parsers/': 'パーサーのテスト',
+                'providers/': 'プロバイダーのテスト',
+                'mocks/': 'テスト用モックファイル'
+            }
+        },
+        'scripts': {
+            description: '開発用スクリプト',
+            purpose: 'ビルド、テスト、パッケージ化の自動化',
+            files: {
+                'package.js': 'パッケージ化スクリプト',
+                'quality-check.js': '品質チェックスクリプト',
+                'simple-test.js': '簡単なテストスクリプト',
+                'test-watch.js': 'テスト監視スクリプト',
+                'docs-generator.js': 'ドキュメント自動生成スクリプト'
+            }
+        },
+        'docs': {
+            description: '技術資料',
+            purpose: 'プロジェクトの技術仕様と開発ガイド',
+            files: {
+                'TECHNICAL.md': '技術仕様書',
+                'STRUCTURE.md': 'プロジェクト構造説明（自動生成）',
+                'index.md': 'ドキュメントインデックス（自動生成）'
+            }
+        },
+        'dist': {
+            description: 'ビルド成果物',
+            purpose: 'VSCode拡張機能パッケージ（.vsix）',
+            files: {}
+        },
+        '.husky': {
+            description: 'Git hooks',
+            purpose: 'コミット前の品質チェック自動化',
+            files: {
+                'pre-commit': 'コミット前品質チェック',
+                'commit-msg': 'コミットメッセージ形式チェック'
+            }
+        },
+        '.github/workflows': {
+            description: 'CI/CD設定',
+            purpose: 'GitHub Actionsによる自動テスト・デプロイ',
+            files: {
+                'ci.yml': 'CI/CDパイプライン設定'
+            }
+        },
+        'templates': {
+            description: 'テンプレートファイル',
+            purpose: 'プロジェクト生成用テンプレート',
+            files: {}
+        },
+        '.devcontainer': {
+            description: '開発コンテナ設定',
+            purpose: 'Docker環境での開発サポート',
+            files: {}
+        },
+        'config': {
+            description: '設定ファイル',
+            purpose: 'プロジェクト設定とドキュメント生成設定',
+            files: {
+                'project-structure.json': 'プロジェクト構造定義'
+            }
+        }
+    };
+}
 
 /**
  * 既存ライブラリの設定
@@ -274,6 +305,9 @@ async function generateStructureDocumentation() {
     console.log('📚 プロジェクト構造ドキュメントを生成中...');
 
     try {
+        // プロジェクト構造設定を読み込み
+        const PROJECT_STRUCTURE = loadProjectStructure();
+
         // プロジェクト構造を解析
         const structure = analyzeDirectory('.');
 
@@ -290,7 +324,7 @@ async function generateStructureDocumentation() {
 laravel-blade-visualizer/
 \`\`\`
 
-${generateStructureMarkdown(structure)}
+${generateStructureMarkdown(structure, PROJECT_STRUCTURE)}
 
 ## ディレクトリ詳細
 
@@ -536,15 +570,16 @@ function extractComments(filePath) {
 /**
  * Markdown形式でディレクトリ構造を生成
  * @param {Object} structure - ディレクトリ構造
+ * @param {Object} projectStructure - プロジェクト構造設定
  * @param {number} level - 見出しレベル
  * @returns {string} Markdown形式の構造
  */
-function generateStructureMarkdown(structure, level = 1) {
+function generateStructureMarkdown(structure, projectStructure, level = 1) {
     let markdown = '';
     const indent = '  '.repeat(level - 1);
 
     // ディレクトリ情報
-    const dirInfo = PROJECT_STRUCTURE[structure.name];
+    const dirInfo = projectStructure[structure.name];
     if (dirInfo) {
         markdown += `${indent}- **${structure.name}/** - ${dirInfo.description}\n`;
         markdown += `${indent}  - 目的: ${dirInfo.purpose}\n`;
@@ -564,7 +599,7 @@ function generateStructureMarkdown(structure, level = 1) {
 
     // サブディレクトリ
     for (const child of structure.children) {
-        markdown += generateStructureMarkdown(child, level + 1);
+        markdown += generateStructureMarkdown(child, projectStructure, level + 1);
     }
 
     return markdown;
