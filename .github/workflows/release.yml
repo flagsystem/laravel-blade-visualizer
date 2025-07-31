@@ -1,0 +1,59 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'リリースバージョン (例: 1.0.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'プレリリースとして作成'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  release:
+    name: 手動リリース作成
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: リポジトリをチェックアウト
+      uses: actions/checkout@v4
+
+    - name: Node.jsをセットアップ
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+
+    - name: 依存関係をインストール
+      run: npm ci
+
+    - name: TypeScriptコンパイル
+      run: npm run compile
+
+    - name: ESLint静的解析
+      run: npm run lint
+
+    - name: ユニットテスト実行
+      run: npm run test:simple
+
+    - name: 品質チェック
+      run: npm run quality
+
+    - name: 拡張機能をパッケージ化
+      run: npm run package
+
+    - name: リリースを作成
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/laravel-blade-visualizer-*.vsix
+        generate_release_notes: true
+        draft: false
+        prerelease: ${{ github.event.inputs.prerelease }}
+        tag_name: v${{ github.event.inputs.version }}
+        name: Release v${{ github.event.inputs.version }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

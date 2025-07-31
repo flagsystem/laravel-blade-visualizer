@@ -2,7 +2,7 @@
 
 A Cursor extension that visualizes parent-child relationships in Laravel Blade template files.
 
-<!-- Last Updated: 2025/7/31 15:26:32 -->
+<!-- Last Updated: 2025/7/31 15:37:36 -->
 
 ## Features
 
@@ -207,6 +207,27 @@ perf: パフォーマンスの改善
 ```
 
 ## Building and Publishing
+
+### ダウンロード
+
+最新のリリースは [GitHub Releases](https://github.com/flagsystem/laravel-blade-visualizer/releases) からダウンロードできます。
+
+**最新版**: [v0.1.1](https://github.com/flagsystem/laravel-blade-visualizer/releases/latest)
+
+### インストール方法
+
+1. **VSIXファイルをダウンロード**
+   - GitHub Releasesページから`.vsix`ファイルをダウンロード
+
+2. **VSCodeにインストール**
+   ```bash
+   code --install-extension laravel-blade-visualizer-0.1.1.vsix
+   ```
+
+3. **手動インストール**
+   - VSCodeで`Ctrl+Shift+P`（または`Cmd+Shift+P`）
+   - "Extensions: Install from VSIX..."を選択
+   - ダウンロードした`.vsix`ファイルを選択
 
 ### 自動パッケージ化
 
