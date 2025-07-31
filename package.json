@@ -40,7 +40,7 @@
         "test": "node ./out/test/runTest.js",
         "test:watch": "node scripts/test-watch.js",
         "test:create": "node scripts/test-watch.js --create-only",
-        "test:unit": "mocha __test__/**/*.test.ts --require ts-node/register",
+        "test:unit": "mocha __test__/**/*.test.ts --require ts-node/register --require tsconfig-paths/register",
         "test:simple": "node scripts/simple-test.js",
         "test:full": "npm run test:simple && npm run test:unit",
         "package": "node scripts/package.js",
@@ -81,6 +81,7 @@
         "marked": "^12.0.0",
         "mocha": "^11.7.1",
         "ts-node": "^10.9.2",
+        "tsconfig-paths": "^4.2.0",
         "typedoc": "^0.24.8",
         "typescript": "^4.8.4",
         "vsce": "^2.15.0"
