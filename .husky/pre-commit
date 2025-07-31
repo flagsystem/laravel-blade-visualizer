@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# ドキュメント自動更新
-echo "📚 ドキュメントを自動更新中..."
-npm run docs:generate:enhanced
+# 軽量ドキュメント自動更新
+echo "📚 軽量ドキュメントを自動更新中..."
+npm run docs:generate:light
 
 # コミット前の品質チェックを実行
 echo "🔍 静的解析とテストを実行中..."

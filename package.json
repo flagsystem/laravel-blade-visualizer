@@ -51,6 +51,7 @@
         "docs:generate": "node scripts/docs-generator.js",
         "docs:update": "npm run docs:generate && npm run quality",
         "docs:generate:enhanced": "node scripts/docs-generator.js",
+        "docs:generate:light": "node scripts/docs-generator-light.js",
         "docs:typedoc": "npx typedoc --out docs/api --excludePrivate --excludeProtected --excludeExternals --includeVersion --readme README.md src/",
         "docs:jsdoc": "npx jsdoc --destination docs/js-api --template node_modules/clean-jsdoc-theme --configure jsdoc.json src/",
         "docs:structure": "node scripts/docs-generator.js",
