@@ -2,7 +2,7 @@
 
 A Cursor extension that visualizes parent-child relationships in Laravel Blade template files.
 
-<!-- Last Updated: 2025/7/31 16:04:11 -->
+<!-- Last Updated: 2025/7/31 16:52:24 -->
 
 ## Features
 
