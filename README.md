@@ -95,11 +95,9 @@ laravel-blade-visualizer/
 - `npm run package:version` - Package extension and update version
 
 #### ドキュメント自動生成スクリプト
-- `npm run docs:generate` - プロジェクト構造とソースコードの説明を自動生成
-- `npm run docs:watch` - ファイル変更を監視してドキュメントを自動更新
+- `npm run docs:generate` - 既存ライブラリを活用したドキュメント生成（推奨）
 - `npm run docs:update` - ドキュメント生成と品質チェックを実行
-- `npm run docs:generate:enhanced` - 既存ライブラリを活用した拡張版ドキュメント生成
-- `npm run docs:watch:enhanced` - 拡張版ドキュメントの監視モード
+- `npm run docs:generate:enhanced` - 拡張版ドキュメント生成（エイリアス）
 - `npm run docs:typedoc` - TypeDocによるAPIドキュメント生成
 - `npm run docs:jsdoc` - JSDocによるAPIドキュメント生成
 - `npm run docs:structure` - プロジェクト構造ドキュメントのみ生成
@@ -128,26 +126,23 @@ laravel-blade-visualizer/
 # 一度だけドキュメントを生成
 npm run docs:generate
 
-# ファイル変更を監視して自動更新
-npm run docs:watch
-
 # ドキュメント生成と品質チェックを実行
 npm run docs:update
+
+# 個別のドキュメント生成
+npm run docs:typedoc    # TypeDocのみ
+npm run docs:jsdoc      # JSDocのみ
 ```
 
-#### 監視対象
-- `src/` - TypeScriptソースコード
-- `__test__/` - テストファイル
-- `scripts/` - 開発用スクリプト
-- `docs/` - 技術資料
-- `templates/` - テンプレートファイル
-- `.github/` - CI/CD設定
+#### 自動更新対象
+- **コミット時**: 全ドキュメントの自動生成
+- **CI/CD時**: 品質チェックとドキュメント生成
+- **手動時**: 個別ドキュメントの生成
 
 #### 自動更新の仕組み
-- **chokidar**: ファイル変更監視ライブラリ
-- **デバウンス機能**: 過度な更新を防止（2秒間隔）
 - **Git hooks**: コミット前の自動ドキュメント更新
 - **CI/CD連携**: 品質チェックパイプラインでの自動実行
+- **手動実行**: 必要に応じて個別ドキュメント生成
 
 #### 既存ライブラリの活用
 - **TypeDoc**: TypeScript APIドキュメント生成

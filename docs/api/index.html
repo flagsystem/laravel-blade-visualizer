@@ -79,11 +79,9 @@
 <li><code>npm run package:version</code> - Package extension and update version</li>
 </ul>
 <a id="md:ドキュメント自動生成スクリプト" class="tsd-anchor"></a><h4><a href="#md:ドキュメント自動生成スクリプト">ドキュメント自動生成スクリプト</a></h4><ul>
-<li><code>npm run docs:generate</code> - プロジェクト構造とソースコードの説明を自動生成</li>
-<li><code>npm run docs:watch</code> - ファイル変更を監視してドキュメントを自動更新</li>
+<li><code>npm run docs:generate</code> - 既存ライブラリを活用したドキュメント生成（推奨）</li>
 <li><code>npm run docs:update</code> - ドキュメント生成と品質チェックを実行</li>
-<li><code>npm run docs:generate:enhanced</code> - 既存ライブラリを活用した拡張版ドキュメント生成</li>
-<li><code>npm run docs:watch:enhanced</code> - 拡張版ドキュメントの監視モード</li>
+<li><code>npm run docs:generate:enhanced</code> - 拡張版ドキュメント生成（エイリアス）</li>
 <li><code>npm run docs:typedoc</code> - TypeDocによるAPIドキュメント生成</li>
 <li><code>npm run docs:jsdoc</code> - JSDocによるAPIドキュメント生成</li>
 <li><code>npm run docs:structure</code> - プロジェクト構造ドキュメントのみ生成</li>
@@ -100,21 +98,17 @@
 <li><code>docs/STRUCTURE.md</code> - プロジェクト構造の詳細説明</li>
 <li><code>docs/TECHNICAL.md</code> - 技術資料（自動更新）</li>
 </ul>
-<a id="md:使用方法" class="tsd-anchor"></a><h4><a href="#md:使用方法">使用方法</a></h4><pre><code class="language-bash"><span class="hl-5"># 一度だけドキュメントを生成</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:generate</span><br/><br/><span class="hl-5"># ファイル変更を監視して自動更新</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:watch</span><br/><br/><span class="hl-5"># ドキュメント生成と品質チェックを実行</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:update</span>
+<a id="md:使用方法" class="tsd-anchor"></a><h4><a href="#md:使用方法">使用方法</a></h4><pre><code class="language-bash"><span class="hl-5"># 一度だけドキュメントを生成</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:generate</span><br/><br/><span class="hl-5"># ドキュメント生成と品質チェックを実行</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:update</span><br/><br/><span class="hl-5"># 個別のドキュメント生成</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:typedoc</span><span class="hl-1">    </span><span class="hl-5"># TypeDocのみ</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:jsdoc</span><span class="hl-1">      </span><span class="hl-5"># JSDocのみ</span>
 </code><button>Copy</button></pre>
-<a id="md:監視対象" class="tsd-anchor"></a><h4><a href="#md:監視対象">監視対象</a></h4><ul>
-<li><code>src/</code> - TypeScriptソースコード</li>
-<li><code>__test__/</code> - テストファイル</li>
-<li><code>scripts/</code> - 開発用スクリプト</li>
-<li><code>docs/</code> - 技術資料</li>
-<li><code>templates/</code> - テンプレートファイル</li>
-<li><code>.github/</code> - CI/CD設定</li>
+<a id="md:自動更新対象" class="tsd-anchor"></a><h4><a href="#md:自動更新対象">自動更新対象</a></h4><ul>
+<li><strong>コミット時</strong>: 全ドキュメントの自動生成</li>
+<li><strong>CI/CD時</strong>: 品質チェックとドキュメント生成</li>
+<li><strong>手動時</strong>: 個別ドキュメントの生成</li>
 </ul>
 <a id="md:自動更新の仕組み" class="tsd-anchor"></a><h4><a href="#md:自動更新の仕組み">自動更新の仕組み</a></h4><ul>
-<li><strong>chokidar</strong>: ファイル変更監視ライブラリ</li>
-<li><strong>デバウンス機能</strong>: 過度な更新を防止（2秒間隔）</li>
 <li><strong>Git hooks</strong>: コミット前の自動ドキュメント更新</li>
 <li><strong>CI/CD連携</strong>: 品質チェックパイプラインでの自動実行</li>
+<li><strong>手動実行</strong>: 必要に応じて個別ドキュメント生成</li>
 </ul>
 <a id="md:既存ライブラリの活用" class="tsd-anchor"></a><h4><a href="#md:既存ライブラリの活用">既存ライブラリの活用</a></h4><ul>
 <li><strong>TypeDoc</strong>: TypeScript APIドキュメント生成</li>
@@ -226,7 +220,7 @@ laravelのbladeファイルの親子関係を可視化する</p>
 <li><a href="#md:機能"><span>機能</span></a></li>
 <li><a href="#md:生成されるドキュメント"><span>生成されるドキュメント</span></a></li>
 <li><a href="#md:使用方法"><span>使用方法</span></a></li>
-<li><a href="#md:監視対象"><span>監視対象</span></a></li>
+<li><a href="#md:自動更新対象"><span>自動更新対象</span></a></li>
 <li><a href="#md:自動更新の仕組み"><span>自動更新の仕組み</span></a></li>
 <li><a href="#md:既存ライブラリの活用"><span>既存ライブラリの活用</span></a></li></ul></li>
 <li><a href="#md:手動品質チェック"><span>手動品質チェック</span></a></li>

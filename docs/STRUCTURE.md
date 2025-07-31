@@ -95,9 +95,7 @@ laravel-blade-visualizer/
         - `providers_BladeTemplateProvider.html` - ファイル
   - **scripts/** - 開発用スクリプト
     - 目的: ビルド、テスト、パッケージ化の自動化
-    - `docs-generator-enhanced.js` - JavaScriptファイル
     - `docs-generator.js` - ドキュメント自動生成スクリプト
-    - `docs-watcher.js` - ドキュメント監視スクリプト
     - `package.js` - パッケージ化スクリプト
     - `quality-check.js` - 品質チェックスクリプト
     - `simple-test.js` - 簡単なテストスクリプト
@@ -341,7 +339,7 @@ laravel-blade-visualizer/
 
 ## 自動生成情報
 
-- **生成日時:** 2025/7/31 5:27:15
+- **生成日時:** 2025/7/31 5:40:37
 - **生成スクリプト:** `scripts/docs-generator.js`
 - **更新方法:** `npm run docs:generate`
 
