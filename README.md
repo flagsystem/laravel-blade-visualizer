@@ -103,6 +103,7 @@ laravel-blade-visualizer/
 - `npm run docs:structure` - プロジェクト構造ドキュメントのみ生成
 
 #### 設定管理スクリプト
+- `npm run config:init` - 設定ファイルの初期化
 - `npm run config:validate` - 設定ファイルの検証
 - `npm run config:backup` - 設定ファイルのバックアップ
 - `npm run config:restore` - 設定ファイルの復元

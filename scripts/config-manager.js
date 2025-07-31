@@ -115,6 +115,114 @@ async function updateConfig(updates) {
 }
 
 /**
+ * 設定ファイルを初期化
+ */
+async function initConfig() {
+    try {
+        // 設定ファイルが既に存在するかチェック
+        if (await fs.pathExists(CONFIG_PATH)) {
+            console.log('⚠️ 設定ファイルは既に存在します');
+            console.log(`   ファイル: ${CONFIG_PATH}`);
+            console.log('   上書きする場合は --force フラグを使用してください');
+            return false;
+        }
+
+        // デフォルト設定を作成
+        const defaultConfig = {
+            'src': {
+                description: 'TypeScriptソースコード',
+                purpose: 'VSCode拡張機能のメインロジック',
+                files: {
+                    'extension.ts': '拡張機能のエントリーポイント',
+                    'parsers/': 'Bladeテンプレート解析ロジック',
+                    'providers/': 'VSCodeツリービュープロバイダー'
+                }
+            },
+            '__test__': {
+                description: 'テストファイル',
+                purpose: 'ユニットテストと統合テスト',
+                files: {
+                    'extension.test.ts': 'メイン拡張機能のテスト',
+                    'parsers/': 'パーサーのテスト',
+                    'providers/': 'プロバイダーのテスト',
+                    'mocks/': 'テスト用モックファイル'
+                }
+            },
+            'scripts': {
+                description: '開発用スクリプト',
+                purpose: 'ビルド、テスト、パッケージ化の自動化',
+                files: {
+                    'package.js': 'パッケージ化スクリプト',
+                    'quality-check.js': '品質チェックスクリプト',
+                    'simple-test.js': '簡単なテストスクリプト',
+                    'test-watch.js': 'テスト監視スクリプト',
+                    'docs-generator.js': 'ドキュメント自動生成スクリプト',
+                    'config-manager.js': '設定管理スクリプト'
+                }
+            },
+            'docs': {
+                description: '技術資料',
+                purpose: 'プロジェクトの技術仕様と開発ガイド',
+                files: {
+                    'TECHNICAL.md': '技術仕様書',
+                    'STRUCTURE.md': 'プロジェクト構造説明（自動生成）',
+                    'index.md': 'ドキュメントインデックス（自動生成）'
+                }
+            },
+            'dist': {
+                description: 'ビルド成果物',
+                purpose: 'VSCode拡張機能パッケージ（.vsix）',
+                files: {}
+            },
+            '.husky': {
+                description: 'Git hooks',
+                purpose: 'コミット前の品質チェック自動化',
+                files: {
+                    'pre-commit': 'コミット前品質チェック',
+                    'commit-msg': 'コミットメッセージ形式チェック'
+                }
+            },
+            '.github/workflows': {
+                description: 'CI/CD設定',
+                purpose: 'GitHub Actionsによる自動テスト・デプロイ',
+                files: {
+                    'ci.yml': 'CI/CDパイプライン設定'
+                }
+            },
+            'templates': {
+                description: 'テンプレートファイル',
+                purpose: 'プロジェクト生成用テンプレート',
+                files: {}
+            },
+            '.devcontainer': {
+                description: '開発コンテナ設定',
+                purpose: 'Docker環境での開発サポート',
+                files: {}
+            },
+            'config': {
+                description: '設定ファイル',
+                purpose: 'プロジェクト設定とドキュメント生成設定',
+                files: {
+                    'project-structure.json': 'プロジェクト構造定義'
+                }
+            }
+        };
+
+        // 設定ファイルを作成
+        await fs.ensureDir('config');
+        await fs.writeJson(CONFIG_PATH, defaultConfig, { spaces: 2 });
+
+        console.log('✅ 設定ファイルを初期化しました:', CONFIG_PATH);
+        console.log('📝 設定ファイルを編集してプロジェクト構造に合わせてください');
+
+        return true;
+    } catch (error) {
+        console.error('❌ 設定ファイルの初期化に失敗しました:', error.message);
+        return false;
+    }
+}
+
+/**
  * 設定ファイルの状態を表示
  */
 async function showConfigStatus() {
@@ -135,6 +243,7 @@ async function showConfigStatus() {
             }
         } else {
             console.log('   ❌ 設定ファイルが見つかりません');
+            console.log('   💡 設定ファイルを初期化してください: npm run config:init');
         }
 
         if (await fs.pathExists(BACKUP_PATH)) {
@@ -159,6 +268,7 @@ function showHelp() {
   node scripts/config-manager.js [コマンド] [オプション]
 
 コマンド:
+  init        設定ファイルを初期化
   validate    設定ファイルを検証
   backup      設定ファイルをバックアップ
   restore     設定ファイルを復元
@@ -166,6 +276,7 @@ function showHelp() {
   update      設定ファイルを更新（対話モード）
 
 例:
+  node scripts/config-manager.js init
   node scripts/config-manager.js validate
   node scripts/config-manager.js backup
   node scripts/config-manager.js status
@@ -185,6 +296,10 @@ async function main() {
     }
 
     switch (command) {
+        case 'init':
+            await initConfig();
+            break;
+
         case 'validate':
             try {
                 const configData = await fs.readFile(CONFIG_PATH, 'utf8');

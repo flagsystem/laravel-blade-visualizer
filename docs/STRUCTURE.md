@@ -21,16 +21,14 @@ laravel-blade-visualizer/
   - `package-lock.json` - npm依存関係ロックファイル
   - `package.json` - npm設定ファイル
   - `tsconfig.json` - TypeScript設定
-  - **.devcontainer/** - 開発コンテナ設定
-    - 目的: Docker環境での開発サポート
+  - **.devcontainer/**
     - `devcontainer.json` - 設定ファイル
   - **.github/**
     - **workflows/**
       - `ci.yml` - YAML設定ファイル
-  - **.husky/** - Git hooks
-    - 目的: コミット前の品質チェック自動化
-    - `commit-msg` - コミットメッセージ形式チェック
-    - `pre-commit` - コミット前品質チェック
+  - **.husky/**
+    - `commit-msg` - ファイル
+    - `pre-commit` - ファイル
     - **_/**
       - `.gitignore` - Git除外設定
       - `applypatch-msg` - ファイル
@@ -49,11 +47,10 @@ laravel-blade-visualizer/
       - `pre-push` - ファイル
       - `pre-rebase` - ファイル
       - `prepare-commit-msg` - ファイル
-  - **__test__/** - テストファイル
-    - 目的: ユニットテストと統合テスト
+  - **__test__/**
     - `extension.test.js` - JavaScriptファイル
     - `extension.test.js.map` - ファイル
-    - `extension.test.ts` - メイン拡張機能のテスト
+    - `extension.test.ts` - TypeScriptソースファイル
     - **mocks/**
       - `vscode.js` - JavaScriptファイル
     - **parsers/**
@@ -64,17 +61,14 @@ laravel-blade-visualizer/
       - `BladeTemplateProvider.test.js` - JavaScriptファイル
       - `BladeTemplateProvider.test.js.map` - ファイル
       - `BladeTemplateProvider.test.ts` - TypeScriptソースファイル
-  - **config/** - 設定ファイル
-    - 目的: プロジェクト設定とドキュメント生成設定
-    - `project-structure.json` - プロジェクト構造定義
-  - **dist/** - ビルド成果物
-    - 目的: VSCode拡張機能パッケージ（.vsix）
+  - **config/**
+    - `project-structure.json` - 設定ファイル
+  - **dist/**
     - `laravel-blade-visualizer-0.1.1.vsix` - ファイル
-  - **docs/** - 技術資料
-    - 目的: プロジェクトの技術仕様と開発ガイド
-    - `STRUCTURE.md` - プロジェクト構造説明（自動生成）
-    - `TECHNICAL.md` - 技術仕様書
-    - `index.md` - ドキュメントインデックス（自動生成）
+  - **docs/**
+    - `STRUCTURE.md` - Markdownドキュメント
+    - `TECHNICAL.md` - Markdownドキュメント
+    - `index.md` - Markdownドキュメント
     - **api/**
       - `.nojekyll` - ファイル
       - `index.html` - ファイル
@@ -96,14 +90,13 @@ laravel-blade-visualizer/
         - `extension.html` - ファイル
         - `parsers_BladeParser.html` - ファイル
         - `providers_BladeTemplateProvider.html` - ファイル
-  - **scripts/** - 開発用スクリプト
-    - 目的: ビルド、テスト、パッケージ化の自動化
+  - **scripts/**
     - `config-manager.js` - JavaScriptファイル
-    - `docs-generator.js` - ドキュメント自動生成スクリプト
-    - `package.js` - パッケージ化スクリプト
-    - `quality-check.js` - 品質チェックスクリプト
-    - `simple-test.js` - 簡単なテストスクリプト
-    - `test-watch.js` - テスト監視スクリプト
+    - `docs-generator.js` - JavaScriptファイル
+    - `package.js` - JavaScriptファイル
+    - `quality-check.js` - JavaScriptファイル
+    - `simple-test.js` - JavaScriptファイル
+    - `test-watch.js` - JavaScriptファイル
   - **src/** - TypeScriptソースコード
     - 目的: VSCode拡張機能のメインロジック
     - `extension.ts` - 拡張機能のエントリーポイント
@@ -111,8 +104,7 @@ laravel-blade-visualizer/
       - `BladeParser.ts` - TypeScriptソースファイル
     - **providers/**
       - `BladeTemplateProvider.ts` - TypeScriptソースファイル
-  - **templates/** - テンプレートファイル
-    - 目的: プロジェクト生成用テンプレート
+  - **templates/**
     - `test-template.ts` - TypeScriptソースファイル
 
 
@@ -127,114 +119,18 @@ laravel-blade-visualizer/
 **主要ファイル:**
 
 - `extension.ts` - 拡張機能のエントリーポイント
-- `parsers/` - Bladeテンプレート解析ロジック
-- `providers/` - VSCodeツリービュープロバイダー
 
 ---
 
-### `__test__/`
+### `invalid/`
 
-**説明:** テストファイル
+**説明:** 不正な設定
 
-**目的:** ユニットテストと統合テスト
+**目的:** テスト用
 
 **主要ファイル:**
 
-- `extension.test.ts` - メイン拡張機能のテスト
-- `parsers/` - パーサーのテスト
-- `providers/` - プロバイダーのテスト
-- `mocks/` - テスト用モックファイル
-
----
-
-### `scripts/`
-
-**説明:** 開発用スクリプト
-
-**目的:** ビルド、テスト、パッケージ化の自動化
-
-**主要ファイル:**
-
-- `package.js` - パッケージ化スクリプト
-- `quality-check.js` - 品質チェックスクリプト
-- `simple-test.js` - 簡単なテストスクリプト
-- `test-watch.js` - テスト監視スクリプト
-- `docs-generator.js` - ドキュメント自動生成スクリプト
-
----
-
-### `docs/`
-
-**説明:** 技術資料
-
-**目的:** プロジェクトの技術仕様と開発ガイド
-
-**主要ファイル:**
-
-- `TECHNICAL.md` - 技術仕様書
-- `STRUCTURE.md` - プロジェクト構造説明（自動生成）
-- `index.md` - ドキュメントインデックス（自動生成）
-
----
-
-### `dist/`
-
-**説明:** ビルド成果物
-
-**目的:** VSCode拡張機能パッケージ（.vsix）
-
----
-
-### `.husky/`
-
-**説明:** Git hooks
-
-**目的:** コミット前の品質チェック自動化
-
-**主要ファイル:**
-
-- `pre-commit` - コミット前品質チェック
-- `commit-msg` - コミットメッセージ形式チェック
-
----
-
-### `.github/workflows/`
-
-**説明:** CI/CD設定
-
-**目的:** GitHub Actionsによる自動テスト・デプロイ
-
-**主要ファイル:**
-
-- `ci.yml` - CI/CDパイプライン設定
-
----
-
-### `templates/`
-
-**説明:** テンプレートファイル
-
-**目的:** プロジェクト生成用テンプレート
-
----
-
-### `.devcontainer/`
-
-**説明:** 開発コンテナ設定
-
-**目的:** Docker環境での開発サポート
-
----
-
-### `config/`
-
-**説明:** 設定ファイル
-
-**目的:** プロジェクト設定とドキュメント生成設定
-
-**主要ファイル:**
-
-- `project-structure.json` - プロジェクト構造定義
+- `test.js` - テストファイル
 
 ---
 
@@ -355,7 +251,7 @@ laravel-blade-visualizer/
 
 ## 自動生成情報
 
-- **生成日時:** 2025/7/31 5:44:44
+- **生成日時:** 2025/7/31 5:51:01
 - **生成スクリプト:** `scripts/docs-generator.js`
 - **更新方法:** `npm run docs:generate`
 
