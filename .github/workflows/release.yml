@@ -13,6 +13,13 @@ on:
         type: boolean
         default: false
 
+# ワークフロー全体の権限設定
+permissions:
+  contents: write
+  packages: write
+  issues: write
+  pull-requests: write
+
 jobs:
   release:
     name: 手動リリース作成
