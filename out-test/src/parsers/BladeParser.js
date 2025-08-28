@@ -1,86 +1,66 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as vscode from 'vscode';
-
-/**
- * Bladeテンプレートの構造を表すインターフェース
- * テンプレートファイルの親子関係とコンポーネント情報を格納する
- */
-export interface BladeTemplate {
-    /** テンプレートファイルの絶対パス */
-    filePath: string;
-    /** テンプレートファイル名 */
-    fileName: string;
-    /** 継承元のテンプレート名（@extendsディレクティブ） */
-    extends?: string;
-    /** 継承元のテンプレートの実際のファイルパス */
-    extendsPath?: string;
-    /** インクルードされるテンプレート名の配列（@includeディレクティブ） */
-    includes: string[];
-    /** インクルードされるテンプレートの実際のファイルパスの配列 */
-    includePaths: string[];
-    /** 使用されるコンポーネント名の配列（@componentディレクティブ） */
-    components: string[];
-    /** 使用されるコンポーネントの実際のファイルパスの配列 */
-    componentPaths: string[];
-    /** 定義されるセクション名の配列（@sectionディレクティブ） */
-    sections: string[];
-}
-
-/**
- * 完全なツリー構造を表すインターフェース
- * 選択中のファイルを中心とした祖先から末端までの関係を表現する
- */
-export interface BladeTreeItem {
-    /** テンプレート情報 */
-    template: BladeTemplate;
-    /** 親要素（継承元） */
-    parent?: BladeTreeItem;
-    /** 子要素（継承先、インクルード先、コンポーネント） */
-    children: BladeTreeItem[];
-    /** アイテムの種類 */
-    type: 'root' | 'extends' | 'include' | 'component' | 'usedBy' | 'info';
-    /** 階層レベル */
-    level: number;
-    /** 選択中のファイルかどうか */
-    isSelected: boolean;
-}
-
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BladeParser = void 0;
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+const vscode = __importStar(require("vscode"));
 /**
  * Laravel Bladeテンプレートファイルを解析するクラス
  * Bladeディレクティブ（@extends、@include、@component、@section）を解析し、
  * テンプレート間の親子関係を抽出する
  */
-export class BladeParser {
-    /** @extendsディレクティブを検出する正規表現 */
-    private readonly extendsRegex = /@extends\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
-    /** @includeディレクティブを検出する正規表現 */
-    private readonly includeRegex = /@include\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
-    /** @componentディレクティブを検出する正規表現 */
-    private readonly componentRegex = /@component\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
-    /** @sectionディレクティブを検出する正規表現 */
-    private readonly sectionRegex = /@section\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
-
-    /** 解析結果のキャッシュ（ファイルパス→テンプレート） */
-    private templateCache: Map<string, BladeTemplate | null> = new Map();
-    /** テンプレート名解決のメモ化キャッシュ（key: currentDir::name → resolvedPath） */
-    private resolveCache: Map<string, string> = new Map();
-
-    /** 正引き参照インデックス（filePath → {extends, includePaths, componentPaths}） */
-    private forwardIndex: Map<string, { extendsPath?: string; includePaths: string[]; componentPaths: string[] }> = new Map();
-    /** 逆引き参照インデックス（filePath → このファイルを参照するファイル集合） */
-    private reverseIndex: Map<string, Set<string>> = new Map();
-    /** インデックス構築済みフラグ */
-    private indexBuilt = false;
-    /** インデックス再構築のデバウンス用タイマー */
-    private indexRebuildTimer: NodeJS.Timeout | null = null;
-
+class BladeParser {
+    constructor() {
+        /** @extendsディレクティブを検出する正規表現 */
+        this.extendsRegex = /@extends\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
+        /** @includeディレクティブを検出する正規表現 */
+        this.includeRegex = /@include\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
+        /** @componentディレクティブを検出する正規表現 */
+        this.componentRegex = /@component\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
+        /** @sectionディレクティブを検出する正規表現 */
+        this.sectionRegex = /@section\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
+        /** 解析結果のキャッシュ（ファイルパス→テンプレート） */
+        this.templateCache = new Map();
+        /** テンプレート名解決のメモ化キャッシュ（key: currentDir::name → resolvedPath） */
+        this.resolveCache = new Map();
+        /** 正引き参照インデックス（filePath → {extends, includePaths, componentPaths}） */
+        this.forwardIndex = new Map();
+        /** 逆引き参照インデックス（filePath → このファイルを参照するファイル集合） */
+        this.reverseIndex = new Map();
+        /** インデックス構築済みフラグ */
+        this.indexBuilt = false;
+        /** インデックス再構築のデバウンス用タイマー */
+        this.indexRebuildTimer = null;
+    }
     /**
      * 指定ファイルのキャッシュとインデックスを無効化する
-     * 
+     *
      * @param {string} filePath - 無効化対象のBladeファイルパス
      */
-    invalidate(filePath: string): void {
+    invalidate(filePath) {
         this.templateCache.delete(filePath);
         // 正引き・逆引きから当該ファイルに関する情報を削除
         this.forwardIndex.delete(filePath);
@@ -90,11 +70,10 @@ export class BladeParser {
         this.indexBuilt = false;
         this.scheduleIndexRebuild();
     }
-
     /**
      * インデックスの再構築をデバウンスしてスケジュールする
      */
-    private scheduleIndexRebuild(): void {
+    scheduleIndexRebuild() {
         if (this.indexRebuildTimer) {
             clearTimeout(this.indexRebuildTimer);
         }
@@ -102,57 +81,57 @@ export class BladeParser {
             this.buildIndex().catch(err => console.error('Index rebuild failed:', err));
         }, 300);
     }
-
     /**
      * 全Bladeファイルを走査し、参照関係のインデックスを構築する
      */
-    async buildIndex(): Promise<void> {
+    async buildIndex() {
         const files = await this.findBladeFiles();
         this.forwardIndex.clear();
         this.reverseIndex.clear();
-
         for (const file of files) {
             const tpl = await this.parseBladeFile(file);
-            if (!tpl) { continue; }
+            if (!tpl) {
+                continue;
+            }
             this.forwardIndex.set(file, {
                 extendsPath: tpl.extendsPath,
                 includePaths: tpl.includePaths.filter(Boolean),
                 componentPaths: tpl.componentPaths.filter(Boolean)
             });
         }
-
         // 逆引き生成
         for (const [from, refs] of this.forwardIndex) {
-            const addReverse = (to?: string) => {
-                if (!to) { return; }
-                if (!this.reverseIndex.has(to)) { this.reverseIndex.set(to, new Set()); }
-                this.reverseIndex.get(to)!.add(from);
+            const addReverse = (to) => {
+                if (!to) {
+                    return;
+                }
+                if (!this.reverseIndex.has(to)) {
+                    this.reverseIndex.set(to, new Set());
+                }
+                this.reverseIndex.get(to).add(from);
             };
             addReverse(refs.extendsPath);
             refs.includePaths.forEach(addReverse);
             refs.componentPaths.forEach(addReverse);
         }
-
         this.indexBuilt = true;
     }
-
     /**
      * インデックスが未構築の場合のみ構築する
      */
-    private async ensureIndex(): Promise<void> {
+    async ensureIndex() {
         if (!this.indexBuilt) {
             await this.buildIndex();
         }
     }
-
     /**
      * Bladeテンプレートファイルを解析し、テンプレート構造を抽出する
-     * 
+     *
      * @param {string} filePath - 解析対象のBladeファイルのパス
      * @returns {Promise<BladeTemplate | null>} 解析結果のテンプレート構造、エラー時はnull
      * @throws {Error} ファイル読み込みエラー
      */
-    async parseBladeFile(filePath: string): Promise<BladeTemplate | null> {
+    async parseBladeFile(filePath) {
         // キャッシュヒット
         if (this.templateCache.has(filePath)) {
             return this.templateCache.get(filePath) ?? null;
@@ -161,9 +140,8 @@ export class BladeParser {
             // VSCodeのドキュメントAPIを使用してファイルを読み込む
             const document = await vscode.workspace.openTextDocument(filePath);
             const content = document.getText();
-
             // テンプレート構造の初期化
-            const template: BladeTemplate = {
+            const template = {
                 filePath,
                 fileName: computeDisplayName(filePath),
                 includes: [],
@@ -172,7 +150,6 @@ export class BladeParser {
                 componentPaths: [],
                 sections: []
             };
-
             // @extendsディレクティブの解析
             const extendsMatch = this.extendsRegex.exec(content);
             if (extendsMatch) {
@@ -180,7 +157,6 @@ export class BladeParser {
                 const resolved = this.resolveTemplatePath(extendsMatch[1], filePath);
                 template.extendsPath = resolved && fs.existsSync(resolved) ? resolved : resolved || undefined;
             }
-
             // @includeディレクティブの解析（複数存在する可能性があるためループ処理）
             let includeMatch;
             while ((includeMatch = this.includeRegex.exec(content)) !== null) {
@@ -190,7 +166,6 @@ export class BladeParser {
                     template.includePaths.push(resolvedPath);
                 }
             }
-
             // @componentディレクティブの解析
             let componentMatch;
             while ((componentMatch = this.componentRegex.exec(content)) !== null) {
@@ -200,31 +175,29 @@ export class BladeParser {
                     template.componentPaths.push(resolvedPath);
                 }
             }
-
             // @sectionディレクティブの解析
             let sectionMatch;
             while ((sectionMatch = this.sectionRegex.exec(content)) !== null) {
                 template.sections.push(sectionMatch[1]);
             }
-
             // キャッシュ保存
             this.templateCache.set(filePath, template);
             return template;
-        } catch (error) {
+        }
+        catch (error) {
             console.error(`Error parsing Blade file ${filePath}:`, error);
             this.templateCache.set(filePath, null);
             return null;
         }
     }
-
     /**
      * 選択中のファイルの完全なツリーを構築する
      * 祖先から末端まで、すべての関係を解析してツリー構造を作成する
-     * 
+     *
      * @param {string} selectedFilePath - 選択中のBladeファイルのパス
      * @returns {Promise<BladeTreeItem | null>} 完全なツリー構造、エラー時はnull
      */
-    async buildCompleteTree(selectedFilePath: string): Promise<BladeTreeItem | null> {
+    async buildCompleteTree(selectedFilePath) {
         try {
             // .blade.phpでない場合はnull
             if (!selectedFilePath.endsWith('.blade.php')) {
@@ -239,24 +212,24 @@ export class BladeParser {
             if (!selectedTemplate) {
                 return null;
             }
-
             // ルートは選択中のファイル
-            const rootItem: BladeTreeItem = {
+            const rootItem = {
                 template: selectedTemplate,
                 children: [],
                 type: 'root',
                 level: 0,
                 isSelected: true
             };
-
             // まず継承チェーン（extends）だけを上位に向かって構築し、順にぶら下げる
-            const chainNodes: BladeTreeItem[] = [rootItem];
-            let current: BladeTemplate | null = selectedTemplate;
+            const chainNodes = [rootItem];
+            let current = selectedTemplate;
             let level = 1;
             while (current && current.extendsPath) {
-                const parentTemplate: BladeTemplate | null = await this.parseBladeFile(current.extendsPath);
-                if (!parentTemplate) { break; }
-                const parentItem: BladeTreeItem = {
+                const parentTemplate = await this.parseBladeFile(current.extendsPath);
+                if (!parentTemplate) {
+                    break;
+                }
+                const parentItem = {
                     template: parentTemplate,
                     parent: chainNodes[chainNodes.length - 1],
                     children: [],
@@ -269,14 +242,12 @@ export class BladeParser {
                 current = parentTemplate;
                 level += 1;
             }
-
             // 次に、各チェーンノードについて include / component の子要素を構築（extendsが先に来る順序を保証）
             const startIndex = chainNodes.length >= 3 ? 2 : 0;
             for (let i = startIndex; i < chainNodes.length; i++) {
                 const node = chainNodes[i];
                 await this.buildDescendantTree(node, node.template, i + 1);
             }
-
             // 逆依存（このファイルを利用しているファイル）を収集し、末尾に追加
             const dependents = await this.findDependents(selectedFilePath);
             if (dependents.length > 0) {
@@ -291,34 +262,31 @@ export class BladeParser {
                     });
                 });
             }
-
             return rootItem;
-        } catch (error) {
+        }
+        catch (error) {
             console.error(`Error building complete tree for ${selectedFilePath}:`, error);
             return null;
         }
     }
-
     /**
      * 祖先（extends）のツリーを構築する
-     * 
+     *
      * @param {BladeTreeItem} parentItem - 親アイテム
      * @param {BladeTemplate} template - 現在のテンプレート
      * @param {number} level - 現在の階層レベル
      */
-    private async buildAncestorTree(parentItem: BladeTreeItem, template: BladeTemplate, level: number): Promise<void> {
+    async buildAncestorTree(parentItem, template, level) {
         if (!template.extends || !template.extendsPath) {
             return;
         }
-
         // 継承元のテンプレートを解析
         const extendsTemplate = await this.parseBladeFile(template.extendsPath);
         if (!extendsTemplate) {
             return;
         }
-
         // 継承元のアイテムを作成
-        const extendsItem: BladeTreeItem = {
+        const extendsItem = {
             template: extendsTemplate,
             parent: parentItem,
             children: [],
@@ -326,36 +294,31 @@ export class BladeParser {
             level,
             isSelected: false
         };
-
         // 親アイテムに追加
         parentItem.children.push(extendsItem);
-
         // 継承元テンプレートに対しても、インクルードとコンポーネントの子要素を再帰的に構築
         await this.buildDescendantTree(extendsItem, extendsTemplate, level + 1);
-
         // さらに上位の継承元がある場合は再帰的に探索
         if (extendsTemplate.extends && extendsTemplate.extendsPath) {
             await this.buildAncestorTree(extendsItem, extendsTemplate, level + 1);
         }
     }
-
     /**
      * 子要素（includes、components）のツリーを構築する
-     * 
+     *
      * @param {BladeTreeItem} parentItem - 親アイテム
      * @param {BladeTemplate} template - 現在のテンプレート
      * @param {number} level - 現在の階層レベル
      */
-    private async buildDescendantTree(parentItem: BladeTreeItem, template: BladeTemplate, level: number): Promise<void> {
+    async buildDescendantTree(parentItem, template, level) {
         // インクルード先を処理
         for (let i = 0; i < template.includes.length; i++) {
             const includeName = template.includes[i];
             const includePath = template.includePaths[i];
-
             if (includePath) {
                 const includeTemplate = await this.parseBladeFile(includePath);
                 if (includeTemplate) {
-                    const includeItem: BladeTreeItem = {
+                    const includeItem = {
                         template: includeTemplate,
                         parent: parentItem,
                         children: [],
@@ -363,24 +326,20 @@ export class BladeParser {
                         level,
                         isSelected: false
                     };
-
                     parentItem.children.push(includeItem);
-
                     // インクルード先の子要素も再帰的に探索
                     await this.buildDescendantTree(includeItem, includeTemplate, level + 1);
                 }
             }
         }
-
         // コンポーネントを処理
         for (let i = 0; i < template.components.length; i++) {
             const componentName = template.components[i];
             const componentPath = template.componentPaths[i];
-
             if (componentPath) {
                 const componentTemplate = await this.parseBladeFile(componentPath);
                 if (componentTemplate) {
-                    const componentItem: BladeTreeItem = {
+                    const componentItem = {
                         template: componentTemplate,
                         parent: parentItem,
                         children: [],
@@ -388,46 +347,42 @@ export class BladeParser {
                         level,
                         isSelected: false
                     };
-
                     parentItem.children.push(componentItem);
-
                     // コンポーネントの子要素も再帰的に探索
                     await this.buildDescendantTree(componentItem, componentTemplate, level + 1);
                 }
             }
         }
     }
-
     /**
      * ワークスペース内のすべてのBladeファイル（.blade.php）を検索する
-     * 
+     *
      * @returns {Promise<string[]>} 検索されたBladeファイルの絶対パスの配列
      */
-    async findBladeFiles(): Promise<string[]> {
+    async findBladeFiles() {
         const files = await vscode.workspace.findFiles('**/*.blade.php');
         return files.map(file => file.fsPath);
     }
-
     /**
      * テンプレート名から実際のファイルパスを解決する
      * Laravelのテンプレート命名規則に従って、相対パスや絶対パスを適切に解決する
-     * 
+     *
      * @param {string} templateName - 解決対象のテンプレート名（例：'common.layouts.blank'）
      * @param {string} currentFilePath - 現在のファイルパス（基準となるパス）
      * @returns {string} 解決されたファイルパス、見つからない場合は空文字列
      */
-    resolveTemplatePath(templateName: string, currentFilePath: string): string {
+    resolveTemplatePath(templateName, currentFilePath) {
         const cleanName = templateName.replace(/\.blade\.php$/, '');
         const cacheKey = `${path.dirname(currentFilePath)}::${cleanName}`;
         const cached = this.resolveCache.get(cacheKey);
-        if (cached !== undefined) { return cached; }
-
+        if (cached !== undefined) {
+            return cached;
+        }
         // ワークスペースのルートディレクトリを取得
         const workspaceFolders = vscode.workspace.workspaceFolders;
         const workspaceRoot = workspaceFolders && workspaceFolders.length > 0
             ? workspaceFolders[0].uri.fsPath
             : path.parse(currentFilePath).root;
-
         // 試行パス一覧（存在確認は後段で行うが、存在しなくても最も妥当なパスを返す）
         const byWorkspaceDot = path.join(workspaceRoot, 'resources', 'views', `${cleanName}.blade.php`);
         const byWorkspaceSlashes = path.join(workspaceRoot, 'resources', 'views', cleanName.replace(/\./g, '/') + '.blade.php');
@@ -435,7 +390,6 @@ export class BladeParser {
         const byCurrentSlashes = path.resolve(path.dirname(currentFilePath), cleanName.replace(/\./g, '/') + '.blade.php');
         const byParentDot = path.resolve(path.dirname(currentFilePath), '..', `${cleanName}.blade.php`);
         const byParentSlashes = path.resolve(path.dirname(currentFilePath), '..', cleanName.replace(/\./g, '/') + '.blade.php');
-
         const possiblePaths = [
             byWorkspaceDot,
             byWorkspaceSlashes,
@@ -444,14 +398,14 @@ export class BladeParser {
             byParentDot,
             byParentSlashes
         ];
-
         for (const pth of possiblePaths) {
             try {
                 if (fs.existsSync(pth)) {
                     this.resolveCache.set(cacheKey, pth);
                     return pth;
                 }
-            } catch {
+            }
+            catch {
                 continue;
             }
         }
@@ -460,40 +414,46 @@ export class BladeParser {
         this.resolveCache.set(cacheKey, fallback);
         return fallback;
     }
-
     /**
      * 指定ファイルを利用しているBladeファイル（@extends/@include/@component）を検索する
-     * 
+     *
      * @param {string} targetFilePath - 依存関係を調査する対象ファイルのパス
      * @returns {Promise<BladeTemplate[]>} 対象ファイルを利用しているテンプレート一覧
      */
-    async findDependents(targetFilePath: string): Promise<BladeTemplate[]> {
+    async findDependents(targetFilePath) {
         await this.ensureIndex();
         const fromSet = this.reverseIndex.get(targetFilePath);
-        if (!fromSet || fromSet.size === 0) { return []; }
-        const out: BladeTemplate[] = [];
+        if (!fromSet || fromSet.size === 0) {
+            return [];
+        }
+        const out = [];
         for (const from of fromSet) {
             const tpl = await this.parseBladeFile(from);
-            if (tpl) { out.push(tpl); }
+            if (tpl) {
+                out.push(tpl);
+            }
         }
         return out;
     }
-
-    private findNodeByPath(node: BladeTreeItem, targetPath: string): BladeTreeItem | undefined {
-        if (node.template.filePath === targetPath) { return node; }
+    findNodeByPath(node, targetPath) {
+        if (node.template.filePath === targetPath) {
+            return node;
+        }
         for (const child of node.children) {
             const hit = this.findNodeByPath(child, targetPath);
-            if (hit) { return hit; }
+            if (hit) {
+                return hit;
+            }
         }
         return undefined;
     }
 }
-
+exports.BladeParser = BladeParser;
 /**
  * ビュー内の相対表示名を計算するユーティリティ
  * resources/views配下であれば相対パスを返し、そうでなければベース名を返す
  */
-function computeDisplayName(filePath: string): string {
+function computeDisplayName(filePath) {
     const normalized = filePath.replace(/\\/g, '/');
     const marker = '/resources/views/';
     const idx = normalized.indexOf(marker);
@@ -511,4 +471,5 @@ function computeDisplayName(filePath: string): string {
         }
     }
     return path.basename(filePath);
-} 
+}
+//# sourceMappingURL=BladeParser.js.map

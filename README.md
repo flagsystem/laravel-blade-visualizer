@@ -101,13 +101,17 @@ npm run watch
 
 ### テストの実行
 ```bash
-# 単体テストを実行
+# 単体テスト（デフォルト）
+npm test
+
+# 単体テスト（明示的に指定）
 npm run test:unit
 
-# 統合テストを実行
-npm run test:simple
+# 統合テスト（VSCode 実行バイナリが必要）
+# Note: ヘッドレス/CI環境では追加設定が必要です（例: xvfb-run）。
+npm run test:integration
 
-# 全テストを実行
+# 全テスト（スモーク + 単体）
 npm run test:full
 
 # テストの監視モード
@@ -204,17 +208,10 @@ npm run package:version
 
 ## 📞 サポート
 
-### 問題の報告
-- [GitHub Issues](https://github.com/flagsystem/laravel-blade-visualizer/issues)で問題を報告
+### 機能要望や問題の報告など
+- [GitHub Issues](https://github.com/flagsystem/laravel-blade-visualizer/issues)で投稿
 - バグ報告時は再現手順と環境情報を含めてください
-
-### 機能要望
-- [GitHub Discussions](https://github.com/flagsystem/laravel-blade-visualizer/discussions)で機能要望を投稿
 - 具体的なユースケースと期待する動作を説明してください
-
-### 質問・相談
-- [GitHub Discussions](https://github.com/flagsystem/laravel-blade-visualizer/discussions)で質問・相談を投稿
-- コミュニティからの回答をお待ちください
 
 ---
 

@@ -3,11 +3,14 @@
  * テスト環境でVSCodeのAPIをモック化する
  */
 
+const fs = require('fs');
+const path = require('path');
+
 // VSCodeの主要なAPIをモック化
 const vscode = {
     // Uri
     Uri: {
-        file: (path) => ({ fsPath: path, scheme: 'file' })
+        file: (p) => ({ fsPath: p, scheme: 'file' })
     },
 
     // TreeItemCollapsibleState
@@ -15,6 +18,13 @@ const vscode = {
         None: 0,
         Collapsed: 1,
         Expanded: 2
+    },
+
+    // ViewColumn
+    ViewColumn: {
+        One: 1,
+        Two: 2,
+        Three: 3
     },
 
     // ExtensionMode
@@ -34,7 +44,7 @@ const vscode = {
     // Disposable
     Disposable: class Disposable {
         constructor(dispose) {
-            this.dispose = dispose;
+            this.dispose = dispose || (() => { });
         }
     },
 
@@ -53,9 +63,15 @@ const vscode = {
 
     // workspace
     workspace: {
-        openTextDocument: async (path) => ({
-            getText: () => ''
-        }),
+        workspaceFolders: [{ uri: { fsPath: '/workspace' } }],
+        openTextDocument: async (arg) => {
+            const filePath = typeof arg === 'string' ? arg : (arg && arg.fsPath) ? arg.fsPath : '';
+            const content = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf-8') : '';
+            return {
+                getText: () => content,
+                fileName: filePath
+            };
+        },
         findFiles: async (pattern) => [],
         createFileSystemWatcher: (pattern) => new vscode.FileSystemWatcher(),
         getConfiguration: () => ({
@@ -65,21 +81,65 @@ const vscode = {
 
     // window
     window: {
+        _activeTextEditor: undefined,
         registerTreeDataProvider: (viewId, provider) => new vscode.Disposable(() => { }),
         showInformationMessage: (message) => { },
-        showErrorMessage: (message) => { }
+        showErrorMessage: (message) => { },
+        showTextDocument: async (document) => {
+            vscode.window._activeTextEditor = { document };
+            return vscode.window._activeTextEditor;
+        },
+        get activeTextEditor() {
+            return this._activeTextEditor;
+        },
+        createWebviewPanel: (viewType, title, viewColumn, options) => {
+            let disposed = false;
+            const disposeCallbacks = [];
+            const webview = {
+                html: '',
+                onDidReceiveMessage: (listener) => new vscode.Disposable(() => { /* no-op in tests */ }),
+                postMessage: async () => true
+            };
+            return {
+                webview,
+                onDidDispose: (cb) => { disposeCallbacks.push(cb); return new vscode.Disposable(() => { }); },
+                dispose: () => { disposed = true; disposeCallbacks.forEach(cb => cb()); }
+            };
+        }
     },
 
     // commands
     commands: {
-        registerCommand: (command, callback) => new vscode.Disposable(() => { })
+        _commands: new Set([
+            'laravel-blade-visualizer.showTree',
+            'laravel-blade-visualizer.showSelectedFileTree',
+            'laravel-blade-visualizer.openVisualizer',
+            'laravel-blade-visualizer.refreshTree',
+            'vscode.openFolder',
+            'vscode.open'
+        ]),
+        registerCommand: (command, callback) => {
+            vscode.commands._commands.add(command);
+            return new vscode.Disposable(() => { vscode.commands._commands.delete(command); });
+        },
+        getCommands: async () => Array.from(vscode.commands._commands),
+        executeCommand: async (command, ...args) => {
+            // テストでは副作用は不要なため、成功扱いにする
+            return undefined;
+        }
+    },
+
+    // extensions
+    extensions: {
+        getExtension: (id) => ({ id, isActive: true })
     },
 
     // EventEmitter
     EventEmitter: class EventEmitter {
         constructor() {
-            this.event = () => { };
-            this.fire = () => { };
+            this._handlers = [];
+            this.event = (handler) => { this._handlers.push(handler); };
+            this.fire = (e) => { this._handlers.forEach(h => h(e)); };
         }
     },
 
@@ -98,7 +158,7 @@ const vscode = {
             this.tooltip = '';
             this.description = '';
             this.iconPath = null;
-            this.command = null;
+            // command はデフォルト未定義（undefined）
         }
     }
 };
