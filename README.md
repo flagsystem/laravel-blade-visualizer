@@ -1,341 +1,221 @@
 # Laravel Blade Visualizer
 
-A Cursor extension that visualizes parent-child relationships in Laravel Blade template files.
+Laravel Bladeテンプレートファイルの親子関係を視覚的に表示し、選択したファイルの完全なツリー構造を表示するVSCode拡張機能です。
 
-<!-- Last Updated: 2025/7/31 15:44:44 -->
+## 🚀 新機能
 
-## Features
+### ✨ 選択中のファイルの完全なツリー表示
+- 現在選択しているBladeファイルを起点とした祖先から末端までの完全なツリー構築
+- `@extends`、`@include`、`@component`ディレクティブの関係を再帰的に解析
+- 選択中のファイルを🎯アイコンでハイライト表示
+- 選択したファイル以外は表示されず、関係のあるファイルのみをクリックで読み込み
 
-- Visualize Blade template inheritance tree
-- Navigate between parent and child templates
-- Real-time parsing of `@extends`, `@include`, and `@component` directives
-- Sidebar tree view for template relationships
+### 🎨 サイドバーアイコン
+- アクティビティバーに専用アイコン（📊）を表示
+- 別窓でのビジュアル表示機能
+- 右クリックメニューからのクイックアクセス
 
-## Development Environment Setup
+### 🔄 ワークフローチックな表示
+- 親子関係を矢印や線で表現
+- 階層レベルごとの視覚的な分離
+- インタラクティブなノード操作（クリックでファイルを開く）
+- カラーコーディングによる関係性の識別
 
-### Prerequisites
+## 📋 機能一覧
 
-- Docker and Docker Compose
-- Cursor IDE
+### 基本機能
+- **選択ファイルのツリー**: 選択中のBladeファイルの関係のみを表示
+- **選択ファイルの完全ツリー**: 選択中のファイルの祖先から末端までの完全なツリー構造を表示
+- **関係性ビュー**: ワークフローチックな視覚的表示
 
-### Getting Started
+### 解析機能
+- `@extends` ディレクティブの継承関係解析
+- `@include` ディレクティブのインクルード関係解析
+- `@component` ディレクティブのコンポーネント関係解析
+- `@section` ディレクティブのセクション定義解析
 
-1. Clone the repository:
+### 表示機能
+- 階層レベルごとのグループ化表示
+- ファイルパスの短縮表示
+- ツールチップによる詳細情報表示
+- ファイルをクリックして直接開く機能
+
+## 🎯 使用方法
+
+### 1. 基本的な使用方法
+1. VSCodeでBladeファイル（`.blade.php`）を開く
+2. サイドバーの「Laravel Blade Visualizer」アイコンをクリック
+3. 「選択ファイルの完全ツリー」で選択中のファイルのツリーを確認
+4. 「関係性ビュー」でワークフローチックな表示を確認
+
+### 2. 右クリックメニューからの使用
+1. Bladeファイルを右クリック
+2. 「Show Selected File Tree」を選択
+3. 選択中のファイルの完全なツリーを表示
+
+### 3. コマンドパレットからの使用
+1. `Ctrl+Shift+P`（または`Cmd+Shift+P`）でコマンドパレットを開く
+2. 以下のコマンドを実行：
+   - `選択ファイルのツリーを表示`: 選択中のファイルのツリー表示
+   - `選択ファイルの完全ツリーを表示`: 選択中のファイルの完全ツリー表示
+   - `Blade Visualizerを開く`: ビジュアライザーを開く
+   - `ツリーを更新`: ツリーの表示を更新
+
+## 🔧 インストール
+
+### VSCode拡張機能マーケットプレイスから
+1. VSCodeを開く
+2. 拡張機能タブ（`Ctrl+Shift+X`）を開く
+3. 「Laravel Blade Visualizer」を検索
+4. インストールボタンをクリック
+
+### 手動インストール
+1. リポジトリをクローン
+2. `npm install`で依存関係をインストール
+3. `npm run compile`でTypeScriptをコンパイル
+4. `npm run package`でVSIXファイルを生成
+5. 生成されたVSIXファイルをVSCodeにインストール
+
+## 🏗️ 開発環境のセットアップ
+
+### 必要な環境
+- Node.js 16.x以上
+- npm 8.x以上
+- VSCode 1.74.0以上
+
+### セットアップ手順
 ```bash
-git clone https://github.com/yourusername/laravel-blade-visualizer.git
+# リポジトリをクローン
+git clone https://github.com/flagsystem/laravel-blade-visualizer.git
 cd laravel-blade-visualizer
-```
 
-2. Open the project in Cursor and use the devcontainer:
-   - Cursor will automatically detect the `.devcontainer` configuration
-   - Click "Reopen in Container" when prompted
-   - The development environment will be set up automatically
-   - The extension debug port is available at `localhost:3001`
-
-3. Install dependencies (if not done automatically):
-```bash
+# 依存関係をインストール
 npm install
-```
 
-4. Compile the extension:
-```bash
+# TypeScriptをコンパイル
 npm run compile
+
+# 開発用のVSCodeインスタンスを起動
+npm run watch
 ```
 
-5. Press F5 to start debugging the extension
-
-## Development
-
-### Cursor IDE Rules
-
-このプロジェクトには `.cursorrules` ファイルが含まれており、以下のルールが設定されています：
-
-- **日本語コメントの充実化**: すべての関数、クラス、メソッドに日本語での詳細なコメントを記述
-- **テストの自動作成**: 新しいコード作成時に自動でテストファイルを生成
-- **テストの自動実行**: ファイル変更時に自動でテストを実行し、失敗時は即座に修正
-- **テストケース命名**: `test` で始まる完結でわかりやすいテストケース名
-
-### Project Structure
-
-```
-laravel-blade-visualizer/
-├── .devcontainer/          # Devcontainer configuration
-├── src/                    # TypeScript source files
-├── __test__/              # Test files
-├── out/                    # Compiled JavaScript files
-├── scripts/                # Development scripts
-├── .github/workflows/      # CI/CD workflows
-├── .husky/                 # Git hooks
-├── templates/              # Code templates
-├── .cursorrules           # Cursor IDE rules
-├── docker-compose.yml      # Docker Compose configuration
-├── Dockerfile             # Docker image definition
-├── package.json           # Extension manifest
-├── tsconfig.json          # TypeScript configuration
-└── README.md             # This file
-```
-
-### Available Scripts
-
-#### 開発スクリプト
-- `npm run compile` - Compile TypeScript to JavaScript
-- `npm run watch` - Watch for changes and recompile
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Run ESLint with auto-fix
-- `npm run test` - Run VSCode extension tests
-- `npm run test:simple` - Run simple unit tests
-- `npm run test:watch` - Watch for file changes and run tests automatically
-- `npm run test:create` - Create test files for missing tests
-
-#### 品質チェックスクリプト
-- `npm run quality` - Run full quality check (compile + lint + test)
-- `npm run precommit` - Run pre-commit quality check
-- `npm run ci` - Run CI/CD pipeline (quality + package)
-
-#### パッケージ化スクリプト
-- `npm run package` - Package extension with automatic yes flag
-- `npm run package:version` - Package extension and update version
-
-#### ドキュメント自動生成スクリプト
-- `npm run docs:generate` - 既存ライブラリを活用したドキュメント生成（推奨）
-- `npm run docs:update` - ドキュメント生成と品質チェックを実行
-- `npm run docs:generate:enhanced` - 拡張版ドキュメント生成（エイリアス）
-- `npm run docs:typedoc` - TypeDocによるAPIドキュメント生成
-- `npm run docs:jsdoc` - JSDocによるAPIドキュメント生成
-- `npm run docs:structure` - プロジェクト構造ドキュメントのみ生成
-
-#### キャッシュ管理スクリプト
-- `npm run config:init` - キャッシュファイルの初期化
-- `npm run config:validate` - キャッシュファイルの検証
-- `npm run config:backup` - キャッシュファイルのバックアップ
-- `npm run config:restore` - キャッシュファイルの復元
-- `npm run config:status` - キャッシュファイルの状態表示
-
-#### 自動解析スクリプト
-- `npm run structure:analyze` - プロジェクト構造を自動解析してキャッシュファイルを更新
-
-## Quality Assurance
-
-### 自動品質チェック
-
-### ドキュメント自動生成
-
-このプロジェクトには、プロジェクト構造とソースコードの説明を自動生成する機能が組み込まれています：
-
-#### 機能
-- **プロジェクト構造の自動解析**: ディレクトリとファイルの階層構造を解析
-- **ソースコードの説明抽出**: JSDocコメントと単行コメントから説明を抽出
-- **Markdown形式でのドキュメント生成**: 読みやすい形式でドキュメントを生成
-- **ファイル変更監視**: プロジェクトファイルの変更を監視して自動更新
-- **Git hooks連携**: コミット時に自動でドキュメントを更新
-
-#### 生成されるドキュメント
-- `docs/STRUCTURE.md` - プロジェクト構造の詳細説明
-- `docs/TECHNICAL.md` - 技術資料（自動更新）
-
-#### 使用方法
+### テストの実行
 ```bash
-# 一度だけドキュメントを生成
-npm run docs:generate
+# 単体テストを実行
+npm run test:unit
 
-# ドキュメント生成と品質チェックを実行
-npm run docs:update
+# 統合テストを実行
+npm run test:simple
 
-# 個別のドキュメント生成
-npm run docs:typedoc    # TypeDocのみ
-npm run docs:jsdoc      # JSDocのみ
+# 全テストを実行
+npm run test:full
+
+# テストの監視モード
+npm run test:watch
 ```
 
-#### 自動更新対象
-- **コミット時**: 全ドキュメントの自動生成（キャッシュファイルから読み込み）
-- **CI/CD時**: 品質チェックとドキュメント生成
-- **手動時**: 個別ドキュメントの生成
-- **構造変更時**: プロジェクト構造の自動解析でキャッシュファイルを更新
-- **キャッシュ変更時**: キャッシュファイルの更新でドキュメント構造を変更
-
-#### 自動更新の仕組み
-- **Git hooks**: コミット前の自動ドキュメント更新
-- **CI/CD連携**: 品質チェックパイプラインでの自動実行
-- **手動実行**: 必要に応じて個別ドキュメント生成
-
-#### 既存ライブラリの活用
-- **TypeDoc**: TypeScript APIドキュメント生成
-- **JSDoc**: JavaScript APIドキュメント生成
-- **clean-jsdoc-theme**: 美しいJSDocテーマ
-- **marked**: Markdown生成ライブラリ
-
-コミット時に自動的に品質チェックが実行されます：
-
-1. **TypeScriptコンパイル** - 型エラーのチェック
-2. **ESLint静的解析** - コードスタイルと品質のチェック
-3. **ユニットテスト** - 基本機能の動作確認
-
-### 手動品質チェック
-
+### コード品質チェック
 ```bash
-# 完全な品質チェック
+# リンターを実行
+npm run lint
+
+# リンターの自動修正
+npm run lint:fix
+
+# 品質チェック（コンパイル + リンター + テスト）
 npm run quality
-
-# コミット前チェック
-npm run precommit
-
-# CI/CDパイプライン
-npm run ci
 ```
 
-### Git Hooks
+## 📦 パッケージ化
 
-- **pre-commit**: コミット前に品質チェックを実行
-- **commit-msg**: コミットメッセージの形式をチェック
-
-### コミットメッセージの形式
-
-```
-type: 説明
-
-例:
-feat: 新機能の追加
-fix: バグ修正
-docs: ドキュメントの更新
-test: テストの追加
-refactor: リファクタリング
-style: コードスタイルの修正
-chore: その他の変更
-ci: CI/CDの設定変更
-build: ビルド設定の変更
-perf: パフォーマンスの改善
-```
-
-## Building and Publishing
-
-### ダウンロード
-
-最新のリリースは [GitHub Releases](https://github.com/flagsystem/laravel-blade-visualizer/releases) からダウンロードできます。
-
-**最新版**: [v0.1.2](https://github.com/flagsystem/laravel-blade-visualizer/releases/latest)
-
-### GitHub Actions権限設定
-
-リリースの自動作成には、以下の権限が必要です：
-
-1. **リポジトリ設定** → **Settings** → **Actions** → **General**
-2. **Workflow permissions** で以下を設定：
-   - ✅ **Read and write permissions**
-   - ✅ **Allow GitHub Actions to create and approve pull requests**
-
-これにより、GitHub Actionsがリリースを作成できるようになります。
-
-### CI/CDパイプラインの詳細
-
-#### **自動実行ワークフロー（ci.yml）**
-- **品質チェック**: TypeScriptコンパイル、ESLint、ユニットテスト
-- **パッケージ作成**: VSIXファイルの生成とアーティファクト保存
-- **リリース作成**: GitHub Releasesへの自動アップロード
-
-#### **手動実行ワークフロー（release.yml）**
-- **手動リリース**: 任意のバージョンでリリースを作成
-- **プレリリース対応**: プレリリースとして公開可能
-- **エラーハンドリング**: 重複タグの検出と適切なエラー処理
-
-#### **権限の詳細説明**
-- **contents: write**: リリース、タグ、ブランチの作成・更新
-- **packages: write**: VSIXファイルのアップロード
-- **issues: write**: リリースノートの自動生成
-- **pull-requests: write**: 自動化されたPR作成
-
-### インストール方法
-
-1. **VSIXファイルをダウンロード**
-   - GitHub Releasesページから`.vsix`ファイルをダウンロード
-
-2. **VSCodeにインストール**
-   ```bash
-   code --install-extension laravel-blade-visualizer-0.1.1.vsix
-   ```
-
-3. **手動インストール**
-   - VSCodeで`Ctrl+Shift+P`（または`Cmd+Shift+P`）
-   - "Extensions: Install from VSIX..."を選択
-   - ダウンロードした`.vsix`ファイルを選択
-
-### 自動パッケージ化
-
-1. 基本的なパッケージ化（自動yesフラグ付き）:
+### VSIXファイルの生成
 ```bash
+# 基本的なパッケージ化
 npm run package
-```
 
-2. パッケージ化とバージョン更新:
-```bash
+# バージョン更新付きパッケージ化
 npm run package:version
 ```
 
-### 手動パッケージ化
+### パッケージ化前の自動処理
+- TypeScriptのコンパイル
+- コード品質チェック
+- テストの実行
 
-1. 従来の方法:
-```bash
-npm run compile
-npx vsce package
-```
+## 🎨 カスタマイズ
 
-2. ローカルインストール:
-```bash
-code --install-extension laravel-blade-visualizer-0.1.0.vsix
-```
+### テーマ対応
+- VSCodeのテーマに合わせて自動的に色が調整される
+- ダークテーマ・ライトテーマの両方に対応
 
-### パッケージ化の自動処理
+### 設定オプション
+現在のバージョンでは設定オプションは提供していませんが、今後のバージョンで以下の設定を追加予定：
+- ツリーの展開状態の記憶
+- 表示する関係性の種類の選択
+- カスタムアイコンの設定
 
-パッケージ化スクリプトは以下の処理を自動実行します：
-- TypeScriptコンパイル
-- コード品質チェック（ESLint）
-- テスト実行
-- 古いパッケージファイルの削除
-- VSCEパッケージ化（--yesフラグ付き）
-- バージョン更新（オプション）
+## 🔍 トラブルシューティング
 
-## License
+### よくある問題
 
-このプロジェクトは [MIT License](LICENSE) の下で公開されています。
+#### 1. ツリーが表示されない
+- Bladeファイル（`.blade.php`）が正しく認識されているか確認
+- ファイルの構文が正しいか確認
+- VSCodeを再起動してみる
 
-- **英語版**: [LICENSE](LICENSE)
-- **日本語版**: [LICENSE.ja.md](LICENSE.ja.md)
+#### 2. 関係性が正しく解析されない
+- Laravelの標準的なディレクトリ構造（`resources/views/`）を使用しているか確認
+- テンプレート名の記述が正しいか確認
+- ファイルパスが正しく解決されているか確認
 
-### ライセンスの概要
+#### 3. パフォーマンスが悪い
+- 大きなファイルや複雑な関係性がある場合、解析に時間がかかる場合があります
+- 必要に応じてファイルサイズを最適化
 
-MITライセンスにより、以下のことが許可されています：
-- ソフトウェアの自由な使用、複製、変更
-- 商用利用
-- 再配布
-- 修正版の作成
+### ログの確認
+- VSCodeの開発者ツール（`Help > Toggle Developer Tools`）でコンソールログを確認
+- エラーメッセージや警告メッセージを確認
 
-詳細については、上記のライセンスファイルをご確認ください。
+## 🤝 コントリビューション
+
+### 開発への参加
+1. このリポジトリをフォーク
+2. 機能ブランチを作成（`git checkout -b feature/amazing-feature`）
+3. 変更をコミット（`git commit -m 'Add some amazing feature'`）
+4. ブランチにプッシュ（`git push origin feature/amazing-feature`）
+5. プルリクエストを作成
+
+### 開発ガイドライン
+- TypeScriptを使用
+- 日本語コメントを充実させる
+- テストを必ず作成する
+- ESLintルールに従う
+- コミットメッセージは日本語で記述
+
+## 📄 ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。詳細は[LICENSE](LICENSE)ファイルを参照してください。
+
+## 🙏 謝辞
+
+- Laravelコミュニティ
+- VSCode拡張機能開発者コミュニティ
+- この拡張機能の開発に協力してくださったすべての方々
+
+## 📞 サポート
+
+### 問題の報告
+- [GitHub Issues](https://github.com/flagsystem/laravel-blade-visualizer/issues)で問題を報告
+- バグ報告時は再現手順と環境情報を含めてください
+
+### 機能要望
+- [GitHub Discussions](https://github.com/flagsystem/laravel-blade-visualizer/discussions)で機能要望を投稿
+- 具体的なユースケースと期待する動作を説明してください
+
+### 質問・相談
+- [GitHub Discussions](https://github.com/flagsystem/laravel-blade-visualizer/discussions)で質問・相談を投稿
+- コミュニティからの回答をお待ちください
 
 ---
 
-laravelのbladeファイルの親子関係を可視化する
-
-## テスト開発
-
-### テストの実行
-
-```bash
-# 通常のテスト実行
-npm test
-
-# ファイル変更を監視してテストを自動実行
-npm run test:watch
-
-# 不足しているテストファイルを自動作成
-npm run test:create
-```
-
-### テストテンプレート
-
-`templates/test-template.ts` にテストファイルのテンプレートが用意されています。
-新しいテストファイルを作成する際は、このテンプレートを参考にしてください。
-
-### テストケースの命名規則
-
-- テストケース名は `test` で始まる
-- 日本語または英語で分かりやすく記述
-- 例: `test正常な入力で期待される結果が返される`
+**Laravel Blade Visualizer** - Laravel Bladeテンプレートの関係性を視覚的に理解しよう！

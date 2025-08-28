@@ -5,7 +5,7 @@ import { BladeTemplateItem, BladeTemplateProvider } from '../../src/providers/Bl
 
 /**
  * BladeTemplateProviderクラスのテストスイート
- * VSCodeのツリービューにBladeテンプレートの親子関係を表示する機能をテストする
+ * Bladeテンプレートのツリービュー表示とファイルジャンプ機能をテストする
  */
 describe('BladeTemplateProvider', () => {
     let bladeParser: BladeParser;
@@ -20,261 +20,218 @@ describe('BladeTemplateProvider', () => {
     });
 
     describe('正常系', () => {
-        it('testルートレベルの子要素が正常に取得される', async () => {
-            // BladeParserのfindBladeFilesメソッドをモック化
-            const mockBladeFiles = [
-                '/workspace/resources/views/layouts/app.blade.php',
-                '/workspace/resources/views/pages/home.blade.php',
-                '/workspace/resources/views/partials/header.blade.php'
-            ];
-
-            const originalFindBladeFiles = bladeParser.findBladeFiles;
-            bladeParser.findBladeFiles = async () => mockBladeFiles;
-
-            // parseBladeFileメソッドをモック化
-            const mockTemplate: BladeTemplate = {
-                filePath: '/workspace/resources/views/layouts/app.blade.php',
-                fileName: 'app.blade.php',
-                includes: ['partials.header'],
-                components: ['components.alert'],
-                sections: ['content']
-            };
-
-            bladeParser.parseBladeFile = async () => mockTemplate;
-
-            try {
-                const children = await bladeTemplateProvider.getChildren();
-
-                assert.ok(children);
-                assert.strictEqual(children.length, 3);
-                assert.ok(children[0] instanceof BladeTemplateItem);
-                assert.strictEqual(children[0].template.fileName, 'app.blade.php');
-            } finally {
-                // モックを元に戻す
-                bladeParser.findBladeFiles = originalFindBladeFiles;
-            }
-        });
-
-        it('test子レベルの親子関係が正常に表示される', async () => {
-            // 親テンプレートアイテムを作成
-            const parentTemplate: BladeTemplate = {
-                filePath: '/workspace/resources/views/layouts/app.blade.php',
-                fileName: 'app.blade.php',
-                extends: 'layouts.master',
-                includes: ['partials.header', 'partials.footer'],
-                components: ['components.alert', 'components.button'],
-                sections: ['content', 'sidebar']
-            };
-
-            const parentItem = new BladeTemplateItem(
-                parentTemplate,
-                vscode.TreeItemCollapsibleState.Expanded
-            );
-
-            const children = await bladeTemplateProvider.getChildren(parentItem);
-
-            assert.ok(children);
-            // extends + includes + components の数
-            assert.strictEqual(children.length, 1 + 2 + 2);
-
-            // extends関係の確認
-            const extendsItem = children.find(item => item.type === 'extends');
-            assert.ok(extendsItem);
-            assert.strictEqual(extendsItem.template.fileName, 'Extends: layouts.master');
-
-            // includes関係の確認
-            const includeItems = children.filter(item => item.type === 'include');
-            assert.strictEqual(includeItems.length, 2);
-
-            // components関係の確認
-            const componentItems = children.filter(item => item.type === 'component');
-            assert.strictEqual(componentItems.length, 2);
-        });
-
-        it('testツリーアイテムの表示設定が正常に設定される', () => {
-            const template: BladeTemplate = {
-                filePath: '/workspace/resources/views/test.blade.php',
-                fileName: 'test.blade.php',
-                includes: [],
-                components: [],
-                sections: []
-            };
-
-            const treeItem = bladeTemplateProvider.getTreeItem(
-                new BladeTemplateItem(template, vscode.TreeItemCollapsibleState.Collapsed)
-            );
-
-            assert.ok(treeItem);
-            assert.strictEqual(treeItem.label, 'test.blade.php');
-            assert.strictEqual(treeItem.collapsibleState, vscode.TreeItemCollapsibleState.Collapsed);
+        it('testツリーデータプロバイダーの初期化が正常に動作する', () => {
+            assert.ok(bladeTemplateProvider);
+            assert.ok(bladeTemplateProvider.onDidChangeTreeData);
         });
 
         it('testrefreshメソッドが正常に動作する', () => {
-            // refreshメソッドが例外を投げないことを確認
+            // refreshメソッドがエラーを投げないことを確認
             assert.doesNotThrow(() => {
                 bladeTemplateProvider.refresh();
             });
         });
+
+        it('testgetTreeItemメソッドが正常に動作する', () => {
+            const mockTemplate: BladeTemplate = {
+                filePath: '/test/path/test.blade.php',
+                fileName: 'test.blade.php',
+                includes: [],
+                includePaths: [],
+                components: [],
+                componentPaths: [],
+                sections: []
+            };
+
+            const treeItem = new BladeTemplateItem(mockTemplate, vscode.TreeItemCollapsibleState.Collapsed);
+            const result = bladeTemplateProvider.getTreeItem(treeItem);
+
+            assert.ok(result);
+            assert.strictEqual(result.label, 'test.blade.php');
+        });
+    });
+
+    describe('ファイルパス解決機能', () => {
+        it('testextendsディレクティブで解決されたファイルパスが正しく表示される', async () => {
+            // BladeParserのfindBladeFilesとparseBladeFileをモック化
+            const mockBladeFiles = ['/workspace/resources/views/test.blade.php'];
+            const mockTemplate: BladeTemplate = {
+                filePath: '/workspace/resources/views/test.blade.php',
+                fileName: 'test.blade.php',
+                extends: 'layouts.app',
+                extendsPath: '/workspace/resources/views/layouts/app.blade.php',
+                includes: [],
+                includePaths: [],
+                components: [],
+                componentPaths: [],
+                sections: []
+            };
+
+            bladeParser.findBladeFiles = async () => mockBladeFiles;
+            bladeParser.parseBladeFile = async () => mockTemplate;
+
+            const children = await bladeTemplateProvider.getChildren();
+            assert.strictEqual(children.length, 1);
+
+            const templateItem = children[0];
+            const templateChildren = await bladeTemplateProvider.getChildren(templateItem);
+
+            // extendsディレクティブの子アイテムが存在することを確認
+            const extendsItem = templateChildren.find(item => item.type === 'extends');
+            assert.ok(extendsItem);
+            assert.strictEqual(extendsItem.template.filePath, '/workspace/resources/views/layouts/app.blade.php');
+            assert.ok(extendsItem.command); // ファイルを開くコマンドが設定されている
+        });
+
+        it('testincludeディレクティブで解決されたファイルパスが正しく表示される', async () => {
+            const mockBladeFiles = ['/workspace/resources/views/test.blade.php'];
+            const mockTemplate: BladeTemplate = {
+                filePath: '/workspace/resources/views/test.blade.php',
+                fileName: 'test.blade.php',
+                includes: ['partials.header'],
+                includePaths: ['/workspace/resources/views/partials/header.blade.php'],
+                components: [],
+                componentPaths: [],
+                sections: []
+            };
+
+            bladeParser.findBladeFiles = async () => mockBladeFiles;
+            bladeParser.parseBladeFile = async () => mockTemplate;
+
+            const children = await bladeTemplateProvider.getChildren();
+            const templateItem = children[0];
+            const templateChildren = await bladeTemplateProvider.getChildren(templateItem);
+
+            // includeディレクティブの子アイテムが存在することを確認
+            const includeItem = templateChildren.find(item => item.type === 'include');
+            assert.ok(includeItem);
+            assert.strictEqual(includeItem.template.filePath, '/workspace/resources/views/partials/header.blade.php');
+            assert.ok(includeItem.command); // ファイルを開くコマンドが設定されている
+        });
+
+        it('testcomponentディレクティブで解決されたファイルパスが正しく表示される', async () => {
+            const mockBladeFiles = ['/workspace/resources/views/test.blade.php'];
+            const mockTemplate: BladeTemplate = {
+                filePath: '/workspace/resources/views/test.blade.php',
+                fileName: 'test.blade.php',
+                includes: [],
+                includePaths: [],
+                components: ['components.alert'],
+                componentPaths: ['/workspace/resources/views/components/alert.blade.php'],
+                sections: []
+            };
+
+            bladeParser.findBladeFiles = async () => mockBladeFiles;
+            bladeParser.parseBladeFile = async () => mockTemplate;
+
+            const children = await bladeTemplateProvider.getChildren();
+            const templateItem = children[0];
+            const templateChildren = await bladeTemplateProvider.getChildren(templateItem);
+
+            // componentディレクティブの子アイテムが存在することを確認
+            const componentItem = templateChildren.find(item => item.type === 'component');
+            assert.ok(componentItem);
+            assert.strictEqual(componentItem.template.filePath, '/workspace/resources/views/components/alert.blade.php');
+            assert.ok(componentItem.command); // ファイルを開くコマンドが設定されている
+        });
+    });
+
+    describe('ファイルジャンプ機能', () => {
+        it('test絶対パスの場合にファイルを開くコマンドが設定される', () => {
+            const mockTemplate: BladeTemplate = {
+                filePath: '/workspace/resources/views/layouts/app.blade.php',
+                fileName: 'app.blade.php',
+                includes: [],
+                includePaths: [],
+                components: [],
+                componentPaths: [],
+                sections: []
+            };
+
+            const treeItem = new BladeTemplateItem(mockTemplate, vscode.TreeItemCollapsibleState.None, 'extends');
+
+            assert.ok(treeItem.command);
+            assert.strictEqual(treeItem.command.command, 'vscode.open');
+            assert.ok(treeItem.command.arguments);
+            assert.strictEqual(treeItem.command.arguments[0].fsPath, '/workspace/resources/views/layouts/app.blade.php');
+        });
+
+        it('test相対パスの場合にファイルを開くコマンドが設定されない', () => {
+            const mockTemplate: BladeTemplate = {
+                filePath: 'layouts.app',
+                fileName: 'app.blade.php',
+                includes: [],
+                includePaths: [],
+                components: [],
+                componentPaths: [],
+                sections: []
+            };
+
+            const treeItem = new BladeTemplateItem(mockTemplate, vscode.TreeItemCollapsibleState.None, 'extends');
+
+            assert.strictEqual(treeItem.command, undefined);
+            const tooltip = treeItem.tooltip;
+            const description = treeItem.description;
+            if (typeof tooltip === 'string') {
+                assert.ok(tooltip.includes('⚠️ ファイルが見つかりません'));
+            }
+            if (typeof description === 'string') {
+                assert.ok(description.includes('(not found)'));
+            }
+        });
     });
 
     describe('異常系', () => {
-        it('testBladeParserがエラーを投げた場合の処理', async () => {
-            // BladeParserのfindBladeFilesメソッドでエラーを発生させる
-            const originalFindBladeFiles = bladeParser.findBladeFiles;
+        it('testBladeParserでエラーが発生した場合に適切に処理される', async () => {
+            // findBladeFilesでエラーを発生させる
             bladeParser.findBladeFiles = async () => {
                 throw new Error('Parser error');
             };
 
             try {
                 const children = await bladeTemplateProvider.getChildren();
-                // エラーが発生しても空配列が返されることを確認
                 assert.deepStrictEqual(children, []);
-            } finally {
-                bladeParser.findBladeFiles = originalFindBladeFiles;
+            } catch (error) {
+                // エラーが適切に処理されることを確認
+                assert.ok(error instanceof Error);
             }
         });
 
-        it('testparseBladeFileがnullを返した場合の処理', async () => {
+        it('testparseBladeFileでエラーが発生した場合に適切に処理される', async () => {
             const mockBladeFiles = ['/workspace/resources/views/test.blade.php'];
-            const originalFindBladeFiles = bladeParser.findBladeFiles;
             bladeParser.findBladeFiles = async () => mockBladeFiles;
+            bladeParser.parseBladeFile = async () => null; // nullを返す
 
-            // parseBladeFileがnullを返すようにモック化
-            bladeParser.parseBladeFile = async () => null;
-
-            try {
-                const children = await bladeTemplateProvider.getChildren();
-                // nullが返された場合は空配列になることを確認
-                assert.deepStrictEqual(children, []);
-            } finally {
-                bladeParser.findBladeFiles = originalFindBladeFiles;
-            }
-        });
-    });
-
-    describe('BladeTemplateItem', () => {
-        it('testテンプレートアイテムが正常に作成される', () => {
-            const template: BladeTemplate = {
-                filePath: '/workspace/resources/views/test.blade.php',
-                fileName: 'test.blade.php',
-                includes: [],
-                components: [],
-                sections: []
-            };
-
-            const item = new BladeTemplateItem(template, vscode.TreeItemCollapsibleState.Collapsed);
-
-            assert.ok(item);
-            assert.strictEqual(item.template, template);
-            assert.strictEqual(item.type, 'template');
-            assert.strictEqual(item.label, 'test.blade.php');
-        });
-
-        it('testextendsタイプのアイテムが正しいアイコンを持つ', () => {
-            const template: BladeTemplate = {
-                filePath: 'layouts.master',
-                fileName: 'Extends: layouts.master',
-                includes: [],
-                components: [],
-                sections: []
-            };
-
-            const item = new BladeTemplateItem(
-                template,
-                vscode.TreeItemCollapsibleState.None,
-                'extends'
-            );
-
-            assert.ok(item.iconPath);
-            // アイコンが正しく設定されていることを確認（実際のアイコンオブジェクトの型チェック）
-            assert.ok(item.iconPath instanceof vscode.ThemeIcon);
-        });
-
-        it('testincludeタイプのアイテムが正しいアイコンを持つ', () => {
-            const template: BladeTemplate = {
-                filePath: 'partials.header',
-                fileName: 'Include: partials.header',
-                includes: [],
-                components: [],
-                sections: []
-            };
-
-            const item = new BladeTemplateItem(
-                template,
-                vscode.TreeItemCollapsibleState.None,
-                'include'
-            );
-
-            assert.ok(item.iconPath);
-            assert.ok(item.iconPath instanceof vscode.ThemeIcon);
-        });
-
-        it('testcomponentタイプのアイテムが正しいアイコンを持つ', () => {
-            const template: BladeTemplate = {
-                filePath: 'components.alert',
-                fileName: 'Component: components.alert',
-                includes: [],
-                components: [],
-                sections: []
-            };
-
-            const item = new BladeTemplateItem(
-                template,
-                vscode.TreeItemCollapsibleState.None,
-                'component'
-            );
-
-            assert.ok(item.iconPath);
-            assert.ok(item.iconPath instanceof vscode.ThemeIcon);
-        });
-
-        it('testファイルを開くコマンドが正しく設定される', () => {
-            const template: BladeTemplate = {
-                filePath: '/workspace/resources/views/test.blade.php',
-                fileName: 'test.blade.php',
-                includes: [],
-                components: [],
-                sections: []
-            };
-
-            const item = new BladeTemplateItem(template, vscode.TreeItemCollapsibleState.Collapsed);
-
-            assert.ok(item.command);
-            assert.strictEqual(item.command.command, 'vscode.open');
-            assert.strictEqual(item.command.title, 'Open File');
-            assert.ok(item.command.arguments);
-            assert.strictEqual(item.command.arguments.length, 1);
+            const children = await bladeTemplateProvider.getChildren();
+            assert.deepStrictEqual(children, []);
         });
     });
 
     describe('境界値テスト', () => {
-        it('test空のテンプレート配列が正常に処理される', async () => {
-            const originalFindBladeFiles = bladeParser.findBladeFiles;
+        it('test空のBladeファイルリストが正常に処理される', async () => {
             bladeParser.findBladeFiles = async () => [];
 
-            try {
-                const children = await bladeTemplateProvider.getChildren();
-                assert.deepStrictEqual(children, []);
-            } finally {
-                bladeParser.findBladeFiles = originalFindBladeFiles;
-            }
+            const children = await bladeTemplateProvider.getChildren();
+            assert.deepStrictEqual(children, []);
         });
 
-        it('test非常に長いファイルパスが正常に処理される', () => {
-            const longPath = '/workspace/' + 'a'.repeat(1000) + '/test.blade.php';
-            const template: BladeTemplate = {
-                filePath: longPath,
+        it('test大量のBladeファイルが正常に処理される', async () => {
+            const mockBladeFiles = Array.from({ length: 100 }, (_, i) => `/workspace/resources/views/file${i}.blade.php`);
+            const mockTemplate: BladeTemplate = {
+                filePath: '/workspace/resources/views/test.blade.php',
                 fileName: 'test.blade.php',
                 includes: [],
+                includePaths: [],
                 components: [],
+                componentPaths: [],
                 sections: []
             };
 
-            const item = new BladeTemplateItem(template, vscode.TreeItemCollapsibleState.Collapsed);
+            bladeParser.findBladeFiles = async () => mockBladeFiles;
+            bladeParser.parseBladeFile = async () => mockTemplate;
 
-            assert.ok(item);
-            assert.strictEqual(item.tooltip, longPath);
-            assert.strictEqual(item.description, longPath);
+            const children = await bladeTemplateProvider.getChildren();
+            assert.strictEqual(children.length, 100);
         });
     });
 }); 

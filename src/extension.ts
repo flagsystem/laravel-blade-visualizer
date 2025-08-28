@@ -1,50 +1,87 @@
 import * as vscode from 'vscode';
 import { BladeParser } from './parsers/BladeParser';
-import { BladeTemplateProvider } from './providers/BladeTemplateProvider';
+import { BladeTemplateProvider, SelectedFileTreeProvider } from './providers/BladeTemplateProvider';
+import { BladeVisualizerProvider } from './providers/BladeVisualizerProvider';
 
-/**
- * Laravel Blade Visualizer拡張機能のアクティベーション関数
- * 拡張機能が有効になった時に実行され、Bladeテンプレートの解析とビジュアライゼーション機能を初期化する
- * 
- * @param {vscode.ExtensionContext} context - VSCode拡張機能のコンテキスト
- */
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Laravel Blade Visualizer is now active!');
-
-    // Bladeパーサーの初期化
     const bladeParser = new BladeParser();
 
-    // ツリーデータプロバイダーの登録
+    // explorers
     const bladeTemplateProvider = new BladeTemplateProvider(bladeParser);
     vscode.window.registerTreeDataProvider('bladeTemplateTree', bladeTemplateProvider);
 
-    // コマンドの登録
-    let disposable = vscode.commands.registerCommand('laravel-blade-visualizer.showTree', () => {
-        vscode.window.showInformationMessage('Blade Template Tree activated!');
-        bladeTemplateProvider.refresh();
+    const selectedFileTreeProvider = new SelectedFileTreeProvider(bladeParser);
+    vscode.window.registerTreeDataProvider('bladeFileTree', selectedFileTreeProvider);
+
+    // visualizer (editor webview)
+    const bladeVisualizerProvider = new BladeVisualizerProvider(bladeParser);
+
+    // commands
+    const showSelectedFileTreeDisposable = vscode.commands.registerCommand('laravel-blade-visualizer.showSelectedFileTree', () => {
+        const activeEditor = vscode.window.activeTextEditor;
+        if (activeEditor && activeEditor.document.fileName.endsWith('.blade.php')) {
+            selectedFileTreeProvider.setSelectedFile(activeEditor.document.fileName);
+        } else {
+            vscode.window.showWarningMessage('Bladeファイルを選択してください');
+        }
     });
 
-    context.subscriptions.push(disposable);
+    const refreshTreeDisposable = vscode.commands.registerCommand('laravel-blade-visualizer.refreshTree', () => {
+        bladeTemplateProvider.refresh();
+        selectedFileTreeProvider.refresh();
+    });
 
-    // ファイル変更の監視を設定し、Bladeファイルの変更時にツリーを更新する
+    const openVisualizerForFile = vscode.commands.registerCommand('laravel-blade-visualizer.openVisualizerForFile', (filePath?: string) => {
+        const targetPath = filePath || vscode.window.activeTextEditor?.document.fileName;
+        if (targetPath && targetPath.endsWith('.blade.php')) {
+            selectedFileTreeProvider.setSelectedFile(targetPath);
+            bladeVisualizerProvider.openVisualizer(targetPath);
+        } else {
+            vscode.window.showWarningMessage('Bladeファイルを選択してください');
+        }
+    });
+
+    // react on active editor changes
+    const activeEditorChangeDisposable = vscode.window.onDidChangeActiveTextEditor(editor => {
+        if (editor && editor.document.fileName.endsWith('.blade.php')) {
+            selectedFileTreeProvider.setSelectedFile(editor.document.fileName);
+            bladeTemplateProvider.refresh();
+        } else {
+            bladeTemplateProvider.refresh();
+        }
+    });
+
+    // initialize once on activation for the currently active editor (fix: first-open empty tree)
+    const initEditor = vscode.window.activeTextEditor;
+    if (initEditor && initEditor.document.fileName.endsWith('.blade.php')) {
+        selectedFileTreeProvider.setSelectedFile(initEditor.document.fileName);
+    }
+
+    // file watching
     const fileWatcher = vscode.workspace.createFileSystemWatcher('**/*.blade.php');
-    fileWatcher.onDidChange(() => {
+    fileWatcher.onDidChange(uri => {
+        bladeParser.invalidate(uri.fsPath);
         bladeTemplateProvider.refresh();
+        selectedFileTreeProvider.refresh();
     });
-    fileWatcher.onDidCreate(() => {
+    fileWatcher.onDidCreate(uri => {
+        bladeParser.invalidate(uri.fsPath);
         bladeTemplateProvider.refresh();
+        selectedFileTreeProvider.refresh();
     });
-    fileWatcher.onDidDelete(() => {
+    fileWatcher.onDidDelete(uri => {
+        bladeParser.invalidate(uri.fsPath);
         bladeTemplateProvider.refresh();
+        selectedFileTreeProvider.refresh();
     });
 
-    context.subscriptions.push(fileWatcher);
+    context.subscriptions.push(
+        showSelectedFileTreeDisposable,
+        refreshTreeDisposable,
+        openVisualizerForFile,
+        activeEditorChangeDisposable,
+        fileWatcher
+    );
 }
 
-/**
- * Laravel Blade Visualizer拡張機能の非アクティベーション関数
- * 拡張機能が無効になった時に実行される
- */
-export function deactivate() {
-    console.log('Laravel Blade Visualizer is now deactivated!');
-} 
+export function deactivate() { } 

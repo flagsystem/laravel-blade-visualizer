@@ -1,24 +1,38 @@
 {
     "name": "laravel-blade-visualizer",
     "displayName": "Laravel Blade Visualizer",
-    "description": "Visualize parent-child relationships in Laravel Blade template files",
+    "description": "Laravel Bladeテンプレートファイルの親子関係を視覚化し、選択したファイルの完全なツリー構造を表示します",
     "version": "0.1.2",
     "engines": {
         "vscode": "^1.74.0"
     },
     "categories": [
+        "Programming Languages",
+        "Visualization",
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:blade",
-        "onLanguage:php"
+        "onStartupFinished",
+        "onView:bladeFileTree",
+        "onView:bladeRelationshipView"
     ],
     "main": "./out/extension.js",
     "contributes": {
         "commands": [
             {
-                "command": "laravel-blade-visualizer.showTree",
-                "title": "Show Blade Template Tree"
+                "command": "laravel-blade-visualizer.showSelectedFileTree",
+                "title": "選択ファイルの完全ツリーを表示",
+                "icon": "$(graph)"
+            },
+            {
+                "command": "laravel-blade-visualizer.openVisualizerForFile",
+                "title": "Blade Visualizer: 指定ファイルをビジュアル表示",
+                "icon": "$(graph)"
+            },
+            {
+                "command": "laravel-blade-visualizer.refreshTree",
+                "title": "ツリーを更新",
+                "icon": "$(refresh)"
             }
         ],
         "views": {
@@ -26,6 +40,37 @@
                 {
                     "id": "bladeTemplateTree",
                     "name": "Blade Template Tree"
+                }
+            ],
+            "bladeVisualizer": [
+                {
+                    "id": "bladeFileTree",
+                    "name": "選択ファイルをツリー表示"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "bladeVisualizer",
+                    "title": "Laravel Blade Visualizer",
+                    "icon": "media/blade-visualizer.svg"
+                }
+            ]
+        },
+        "menus": {
+            "editor/context": [
+                {
+                    "command": "laravel-blade-visualizer.showSelectedFileTree",
+                    "when": "resourceExtname == .blade.php",
+                    "group": "navigation"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "laravel-blade-visualizer.refreshTree",
+                    "when": "view == bladeFileTree || view == bladeRelationshipView",
+                    "group": "navigation@9"
                 }
             ]
         }
@@ -56,21 +101,17 @@
         "docs:typedoc": "npx typedoc --out docs/api --excludePrivate --excludeProtected --excludeExternals --includeVersion --readme README.md src/",
         "docs:jsdoc": "npx jsdoc --destination docs/js-api --template node_modules/clean-jsdoc-theme --configure jsdoc.json src/",
         "docs:structure": "node scripts/docs-generator.js",
-        "config:init": "node scripts/config-manager.js init",
-        "config:validate": "node scripts/config-manager.js validate",
-        "config:backup": "node scripts/config-manager.js backup",
-        "config:restore": "node scripts/config-manager.js restore",
-        "config:status": "node scripts/config-manager.js status",
-        "structure:analyze": "node scripts/structure-analyzer.js analyze",
         "prepare": "husky"
     },
     "devDependencies": {
+        "@types/chai": "^5.2.2",
         "@types/mocha": "^10.0.10",
         "@types/node": "16.x",
         "@types/vscode": "^1.74.0",
         "@typescript-eslint/eslint-plugin": "^5.42.0",
         "@typescript-eslint/parser": "^5.42.0",
         "@vscode/test-electron": "^2.5.2",
+        "chai": "^6.0.1",
         "clean-jsdoc-theme": "^4.3.0",
         "eslint": "^8.26.0",
         "fs-extra": "^11.2.0",
@@ -96,7 +137,12 @@
         "blade",
         "template",
         "visualization",
-        "php"
+        "php",
+        "tree",
+        "relationship",
+        "extends",
+        "include",
+        "component"
     ],
     "license": "MIT",
     "prepare": "husky",
