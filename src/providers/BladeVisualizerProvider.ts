@@ -127,6 +127,8 @@ export class BladeVisualizerProvider {
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid var(--vscode-panel-border);
+			position: relative;
+			z-index: 2;
         }
         .title {
             font-size: 18px;
@@ -155,10 +157,17 @@ export class BladeVisualizerProvider {
             padding: 20px;
             min-height: 600px;
             position: relative;
-        }
+			overflow: auto;
+		}
+		.tree-diagram ul { list-style: none; margin: 0; padding-left: 24px; position: relative; }
+		.tree-diagram ul.root { padding-left: 0; }
+		.tree-diagram ul::before { content: ''; position: absolute; top: 0; bottom: 0; left: 10px; width: 2px; background: var(--vscode-descriptionForeground); }
+		.tree-diagram li { position: relative; padding-left: 24px; margin: 6px 0; }
+		.tree-diagram li::before { content: ''; position: absolute; top: 12px; left: 0; width: 10px; height: 2px; background: var(--vscode-descriptionForeground); }
+
         .tree-node {
             display: inline-block;
-            margin: 10px;
+			margin: 0;
             padding: 12px 16px;
             border: 2px solid var(--vscode-panel-border);
             border-radius: 6px;
@@ -172,25 +181,15 @@ export class BladeVisualizerProvider {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         .tree-node.selected {
-            border-color: var(--vscode-focusBorder);
-            background-color: var(--vscode-focusBorder);
-            color: var(--vscode-editor-background);
+			border-color: #d70022;
+			background-color: #d70022;
+			color: #ffffff;
         }
-        .tree-node.extends {
-            border-color: var(--vscode-charts-blue);
-            background-color: var(--vscode-charts-blue);
-            color: white;
-        }
-        .tree-node.include {
-            border-color: var(--vscode-charts-green);
-            background-color: var(--vscode-charts-green);
-            color: white;
-        }
-        .tree-node.component {
-            border-color: var(--vscode-charts-orange);
-            background-color: var(--vscode-charts-orange);
-            color: white;
-        }
+        		/* 祖先（extends）を青、子孫（include/component）を緑で表現 */
+		.tree-node.extends { border-color: var(--vscode-charts-blue); }
+		.tree-node.include, .tree-node.component { border-color: var(--vscode-charts-green); }
+		/* 未選択の最上位祖先(ルート)を紫で表現 */
+		.tree-node.root-unselected { border-color: var(--vscode-charts-purple); }
         .node-label {
             font-weight: bold;
             margin-bottom: 4px;
@@ -242,13 +241,15 @@ export class BladeVisualizerProvider {
         }
         .legend {
             position: fixed;
-            top: 20px;
+			bottom: 20px;
             right: 20px;
             background-color: var(--vscode-editor-background);
             border: 1px solid var(--vscode-panel-border);
             border-radius: 6px;
             padding: 16px;
             font-size: 12px;
+			pointer-events: none;
+			z-index: 1;
         }
         .legend-item {
             display: flex;
@@ -260,11 +261,12 @@ export class BladeVisualizerProvider {
             height: 16px;
             border-radius: 3px;
             margin-right: 8px;
+			border: 1px solid var(--vscode-panel-border);
         }
-        .legend-color.selected { background-color: var(--vscode-focusBorder); }
-        .legend-color.extends { background-color: var(--vscode-charts-blue); }
-        .legend-color.include { background-color: var(--vscode-charts-green); }
-        .legend-color.component { background-color: var(--vscode-charts-orange); }
+				.legend-color.selected { background-color: #d70022; }
+		.legend-color.ancestors { background-color: var(--vscode-charts-blue); }
+		.legend-color.descendants { background-color: var(--vscode-charts-green); }
+		.legend-color.root { background-color: var(--vscode-charts-purple); }
     </style>
 </head>
 <body>
@@ -272,8 +274,6 @@ export class BladeVisualizerProvider {
         <div class="title">🎯 Blade Template Visualizer</div>
         <div class="controls">
             <button onclick="refreshVisualizer()">🔄 更新</button>
-            <button onclick="expandAll()">📂 全て展開</button>
-            <button onclick="collapseAll()">📁 全て折りたたみ</button>
         </div>
     </div>
 
@@ -283,22 +283,10 @@ export class BladeVisualizerProvider {
 
     <div class="legend">
         <div style="font-weight: bold; margin-bottom: 10px;">凡例</div>
-        <div class="legend-item">
-            <div class="legend-color selected"></div>
-            <span>選択中のファイル</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color extends"></div>
-            <span>継承元 (@extends)</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color include"></div>
-            <span>インクルード (@include)</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color component"></div>
-            <span>コンポーネント (@component)</span>
-        </div>
+		<div class="legend-item"><div class="legend-color selected"></div><span>選択中</span></div>
+		<div class="legend-item"><div class="legend-color root"></div><span>未選択の最上位祖先(ルート)</span></div>
+		<div class="legend-item"><div class="legend-color ancestors"></div><span>祖先チェーン（extends）</span></div>
+		<div class="legend-item"><div class="legend-color descendants"></div><span>子孫（include/component）</span></div>
     </div>
 
     <script>
@@ -316,28 +304,6 @@ export class BladeVisualizerProvider {
         function refreshVisualizer() {
             vscode.postMessage({
                 command: 'refresh'
-            });
-        }
-
-        // 全て展開
-        function expandAll() {
-            const nodes = document.querySelectorAll('.tree-node');
-            nodes.forEach(node => {
-                node.style.transform = 'scale(1.05)';
-                setTimeout(() => {
-                    node.style.transform = 'scale(1)';
-                }, 200);
-            });
-        }
-
-        // 全て折りたたみ
-        function collapseAll() {
-            const nodes = document.querySelectorAll('.tree-node');
-            nodes.forEach(node => {
-                node.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    node.style.transform = 'scale(1)';
-                }, 200);
             });
         }
 
@@ -447,34 +413,24 @@ export class BladeVisualizerProvider {
      * @returns {string} ツリー構造のHTML
      */
     private generateTreeHTML(tree: BladeTreeItem): string {
-        const levels = this.groupNodesByLevel(tree);
-        let html = '';
-
-        // 各レベルごとにHTMLを生成
-        for (let level = 0; level < levels.length; level++) {
-            const nodes = levels[level];
-            html += '<div class="tree-level">';
-            html += `<div class="level-indicator">Level ${level}</div>`;
-
-            nodes.forEach(node => {
-                const nodeClass = this.getNodeClass(node);
-                const nodeType = this.getNodeTypeLabel(node.type);
-
-                html += `
-                    <div class="tree-node ${nodeClass}" 
-                         data-file-path="${node.template.filePath}"
-                         title="${node.template.filePath}">
+        const renderNode = (node: BladeTreeItem): string => {
+            const nodeClass = this.getNodeClass(node);
+            const nodeType = this.getNodeTypeLabel(node.type);
+            const childrenHtml = node.children.length > 0
+                ? `<ul>${node.children.map(c => renderNode(c)).join('')}</ul>`
+                : '';
+            return `
+				<li>
+					<div class="tree-node ${nodeClass}" data-file-path="${node.template.filePath}" title="${node.template.filePath}">
                         <div class="node-label">${node.template.fileName}</div>
                         <div class="node-path">${this.getShortPath(node.template.filePath)}</div>
                         <div class="node-type">${nodeType}</div>
                     </div>
-                `;
-            });
-
-            html += '</div>';
-        }
-
-        return html;
+					${childrenHtml}
+				</li>
+			`;
+        };
+        return `<div class="tree-diagram"><ul class="root">${renderNode(tree)}</ul></div>`;
     }
 
     /**
@@ -518,6 +474,9 @@ export class BladeVisualizerProvider {
         if (node.isSelected) {
             return 'selected';
         }
+        if (node.type === 'root') {
+            return 'root-unselected';
+        }
         return node.type;
     }
 
@@ -533,6 +492,7 @@ export class BladeVisualizerProvider {
             case 'extends': return '継承元';
             case 'include': return 'インクルード';
             case 'component': return 'コンポーネント';
+            case 'usedBy': return '参照元';
             default: return type;
         }
     }
@@ -548,5 +508,93 @@ export class BladeVisualizerProvider {
             return filePath.split('resources/views/')[1];
         }
         return path.basename(filePath);
+    }
+}
+
+/**
+ * サイドバーの`bladeRelationshipView`にグラフを描画するWebviewViewProvider
+ */
+export class BladeRelationshipViewProvider implements vscode.WebviewViewProvider {
+    public static readonly viewType = 'bladeRelationshipView';
+    private view: vscode.WebviewView | undefined;
+
+    constructor(private readonly bladeParser: BladeParser) { }
+
+    /**
+     * @param webviewView WebviewView
+     */
+    resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
+        this.view = webviewView;
+        webviewView.webview.options = { enableScripts: true };
+
+        // 初回描画
+        this.renderForActiveEditor();
+
+        // アクティブエディタ変更で更新
+        vscode.window.onDidChangeActiveTextEditor(() => this.renderForActiveEditor());
+    }
+
+    /**
+     * アクティブなBladeファイルに対して描画
+     */
+    private async renderForActiveEditor(): Promise<void> {
+        if (!this.view) { return; }
+        const active = vscode.window.activeTextEditor;
+        if (!active || !active.document.fileName.endsWith('.blade.php')) {
+            this.view.webview.html = this.renderInfo('Bladeファイルを開くと、ここに関係グラフが表示されます');
+            return;
+        }
+
+        const tree = await this.bladeParser.buildCompleteTree(active.document.fileName);
+        if (!tree) {
+            this.view.webview.html = this.renderInfo('ツリーの構築に失敗しました');
+            return;
+        }
+
+        // BladeVisualizerProviderのHTML生成を再利用せず、このビュー用の軽量HTMLを生成
+        this.view.webview.html = this.renderGraphHtml(tree);
+    }
+
+    private renderInfo(message: string): string {
+        return `<div style="padding:12px;color:var(--vscode-descriptionForeground);">${message}</div>`;
+    }
+
+    private renderGraphHtml(tree: BladeTreeItem): string {
+        const renderNode = (n: BladeTreeItem): string => {
+            const cls = n.isSelected ? 'selected' : (n.type === 'root' ? 'root-unselected' : n.type);
+            const children = n.children.length ? `<ul>${n.children.map(renderNode).join('')}</ul>` : '';
+            return `<li>
+                <div class="tree-node ${cls}">
+                    <div class="node-label">${n.template.fileName}</div>
+                    <div class="node-path">${this.shortPath(n.template.filePath)}</div>
+                </div>
+                ${children}
+            </li>`;
+        };
+
+        return `<!DOCTYPE html><html><head><meta charset="utf-8" />
+        <style>
+            body{margin:0;padding:8px;background:var(--vscode-editor-background);color:var(--vscode-editor-foreground);} 
+            .tree ul{list-style:none;margin:0;padding-left:24px;position:relative}
+            .tree ul.root{padding-left:0}
+            			.tree ul::before{content:'';position:absolute;top:0;bottom:0;left:10px;width:2px;background:var(--vscode-descriptionForeground)}
+			.tree li{position:relative;padding-left:24px;margin:6px 0}
+			.tree li::before{content:'';position:absolute;top:12px;left:0;width:10px;height:2px;background:var(--vscode-descriptionForeground)}
+            .tree-node{display:inline-block;margin:0;padding:8px 10px;border:2px solid var(--vscode-panel-border);border-radius:6px}
+            .tree-node.selected{border-color:#d70022;background:#d70022;color:#fff}
+            .tree-node.extends{border-color:var(--vscode-charts-blue)}
+            .tree-node.include,.tree-node.component{border-color:var(--vscode-charts-green)}
+            .tree-node.root-unselected{border-color:var(--vscode-charts-purple)}
+            .node-label{font-weight:bold}
+            .node-path{font-size:11px;opacity:.8;max-width:180px;word-break:break-all}
+        </style></head><body>
+            <div class="tree"><ul class="root">${renderNode(tree)}</ul></div>
+        </body></html>`;
+    }
+
+    // levelizeは不要になったが一旦残す
+
+    private shortPath(filePath: string): string {
+        return filePath.includes('resources/views/') ? filePath.split('resources/views/')[1] : path.basename(filePath);
     }
 } 

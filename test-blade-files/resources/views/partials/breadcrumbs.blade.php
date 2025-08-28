@@ -7,7 +7,7 @@
                 </a>
             </li>
             @foreach($breadcrumbs as $breadcrumb)
-                @if($loop->last)
+                @if($loop->last)〜
                     <li class="breadcrumb-item active" aria-current="page">
                         {{ $breadcrumb['title'] }}
                     </li>

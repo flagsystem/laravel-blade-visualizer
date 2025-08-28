@@ -197,9 +197,9 @@ export class SelectedFileTreeProvider implements vscode.TreeDataProvider<BladeTr
         treeItem.tooltip = element.template.filePath;
         if (this.isAbsolutePath(element.template.filePath)) {
             treeItem.command = {
-                command: 'vscode.open',
-                title: 'ファイルを開く',
-                arguments: [vscode.Uri.file(element.template.filePath)]
+                command: 'laravel-blade-visualizer.openVisualizerForFile',
+                title: 'Visualize Blade Relationships',
+                arguments: [element.template.filePath]
             };
         }
 
@@ -272,9 +272,6 @@ export class BladeTemplateItem extends vscode.TreeItem {
             case 'component':
                 this.iconPath = new vscode.ThemeIcon('symbol-class');
                 break;
-            case 'info':
-                this.iconPath = new vscode.ThemeIcon('info');
-                break;
             default:
                 this.iconPath = new vscode.ThemeIcon('file-code');
         }
@@ -282,9 +279,8 @@ export class BladeTemplateItem extends vscode.TreeItem {
         // ファイルパスが実際のファイルパス（絶対パス）の場合のみ、ファイルを開くコマンドを設定
         if (this.isAbsolutePath(template.filePath)) {
             this.command = {
-                command: 'vscode.open',
-                title: 'Open File',
-                arguments: [vscode.Uri.file(template.filePath)]
+                command: 'workbench.view.extension.bladeVisualizer',
+                title: 'Laravel Blade Visualizer を開く'
             };
         } else {
             // 相対パスの場合はツールチップに警告を表示

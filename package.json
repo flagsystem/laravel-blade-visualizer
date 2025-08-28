@@ -12,26 +12,21 @@
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:blade",
-        "onLanguage:php",
-        "onStartupFinished"
+        "onStartupFinished",
+        "onView:bladeFileTree",
+        "onView:bladeRelationshipView"
     ],
     "main": "./out/extension.js",
     "contributes": {
         "commands": [
-            {
-                "command": "laravel-blade-visualizer.showTree",
-                "title": "選択ファイルのツリーを表示",
-                "icon": "$(symbol-class)"
-            },
             {
                 "command": "laravel-blade-visualizer.showSelectedFileTree",
                 "title": "選択ファイルの完全ツリーを表示",
                 "icon": "$(graph)"
             },
             {
-                "command": "laravel-blade-visualizer.openVisualizer",
-                "title": "Blade Visualizerを開く",
+                "command": "laravel-blade-visualizer.openVisualizerForFile",
+                "title": "Blade Visualizer: 指定ファイルをビジュアル表示",
                 "icon": "$(graph)"
             },
             {
@@ -44,19 +39,13 @@
             "explorer": [
                 {
                     "id": "bladeTemplateTree",
-                    "name": "選択ファイルのツリー"
+                    "name": "Blade Template Tree"
                 }
             ],
             "bladeVisualizer": [
                 {
                     "id": "bladeFileTree",
-                    "name": "選択ファイルの完全ツリー",
-                    "when": "resourceExtname == .blade.php"
-                },
-                {
-                    "id": "bladeRelationshipView",
-                    "name": "関係性ビュー",
-                    "when": "resourceExtname == .blade.php"
+                    "name": "選択ファイルをツリー表示"
                 }
             ]
         },
@@ -65,45 +54,23 @@
                 {
                     "id": "bladeVisualizer",
                     "title": "Laravel Blade Visualizer",
-                    "icon": "$(graph)"
+                    "icon": "media/blade-visualizer.svg"
                 }
             ]
         },
         "menus": {
             "editor/context": [
                 {
-                    "command": "laravel-blade-visualizer.showTree",
-                    "when": "resourceExtname == .blade.php",
-                    "group": "navigation"
-                },
-                {
                     "command": "laravel-blade-visualizer.showSelectedFileTree",
-                    "when": "resourceExtname == .blade.php",
-                    "group": "navigation"
-                },
-                {
-                    "command": "laravel-blade-visualizer.refreshTree",
                     "when": "resourceExtname == .blade.php",
                     "group": "navigation"
                 }
             ],
             "view/title": [
                 {
-                    "command": "laravel-blade-visualizer.openVisualizer",
-                    "when": "view == bladeFileTree",
-                    "group": "navigation"
-                },
-                {
                     "command": "laravel-blade-visualizer.refreshTree",
-                    "when": "view == bladeFileTree",
-                    "group": "navigation"
-                }
-            ],
-            "view/context": [
-                {
-                    "command": "laravel-blade-visualizer.refreshTree",
-                    "when": "view == bladeFileTree",
-                    "group": "inline"
+                    "when": "view == bladeFileTree || view == bladeRelationshipView",
+                    "group": "navigation@9"
                 }
             ]
         }
@@ -134,12 +101,6 @@
         "docs:typedoc": "npx typedoc --out docs/api --excludePrivate --excludeProtected --excludeExternals --includeVersion --readme README.md src/",
         "docs:jsdoc": "npx jsdoc --destination docs/js-api --template node_modules/clean-jsdoc-theme --configure jsdoc.json src/",
         "docs:structure": "node scripts/docs-generator.js",
-        "config:init": "node scripts/config-manager.js init",
-        "config:validate": "node scripts/config-manager.js validate",
-        "config:backup": "node scripts/config-manager.js backup",
-        "config:restore": "node scripts/config-manager.js restore",
-        "config:status": "node scripts/config-manager.js status",
-        "structure:analyze": "node scripts/structure-analyzer.js analyze",
         "prepare": "husky"
     },
     "devDependencies": {
