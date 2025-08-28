@@ -1,7 +1,7 @@
 {
-  "lastUpdated": "2025-07-31T06:40:35.009Z",
+  "lastUpdated": "2025-08-28T07:03:20.329Z",
   "projectName": "Laravel Blade Visualizer",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "directories": [
     "src/",
     "__test__/",
@@ -9,5 +9,5 @@
     "scripts/",
     "templates/"
   ],
-  "contentHash": "6a46bf2f"
+  "contentHash": "e803a026"
 }
