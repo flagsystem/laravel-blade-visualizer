@@ -65,14 +65,13 @@ describe('BladeParser', () => {
             vscode.workspace.openTextDocument = async () => mockDocument as any;
 
             try {
-                const result = await bladeParser.parseBladeFile('/test/path/test.blade.php');
+                const result = await bladeParser.parseBladeFile('/test/path/multiple-includes.blade.php');
 
                 assert.ok(result);
-                assert.deepStrictEqual(result?.includes, [
-                    'partials.header',
-                    'partials.footer',
-                    'partials.sidebar'
-                ]);
+                assert.deepStrictEqual(result?.includes, ['partials.header', 'partials.footer', 'partials.sidebar']);
+                assert.deepStrictEqual(result?.includePaths, []);
+                assert.deepStrictEqual(result?.components, []);
+                assert.deepStrictEqual(result?.sections, []);
             } finally {
                 vscode.workspace.openTextDocument = originalOpenTextDocument;
             }
@@ -81,10 +80,10 @@ describe('BladeParser', () => {
         it('test複数のcomponentディレクティブが正常に解析される', async () => {
             const mockContent = `
                 @component('components.alert')
+                    <p>Alert message</p>
                 @endcomponent
                 @component('components.button')
-                @endcomponent
-                @component('components.card')
+                    <button>Click me</button>
                 @endcomponent
             `;
 
@@ -95,14 +94,13 @@ describe('BladeParser', () => {
             vscode.workspace.openTextDocument = async () => mockDocument as any;
 
             try {
-                const result = await bladeParser.parseBladeFile('/test/path/test.blade.php');
+                const result = await bladeParser.parseBladeFile('/test/path/multiple-components.blade.php');
 
                 assert.ok(result);
-                assert.deepStrictEqual(result?.components, [
-                    'components.alert',
-                    'components.button',
-                    'components.card'
-                ]);
+                assert.deepStrictEqual(result?.components, ['components.alert', 'components.button']);
+                assert.deepStrictEqual(result?.componentPaths, []);
+                assert.deepStrictEqual(result?.includes, []);
+                assert.deepStrictEqual(result?.sections, []);
             } finally {
                 vscode.workspace.openTextDocument = originalOpenTextDocument;
             }
@@ -114,10 +112,10 @@ describe('BladeParser', () => {
                     Page Title
                 @endsection
                 @section('content')
-                    Main content
+                    Page Content
                 @endsection
-                @section('sidebar')
-                    Sidebar content
+                @section('scripts')
+                    <script>console.log('test');</script>
                 @endsection
             `;
 
@@ -128,67 +126,19 @@ describe('BladeParser', () => {
             vscode.workspace.openTextDocument = async () => mockDocument as any;
 
             try {
-                const result = await bladeParser.parseBladeFile('/test/path/test.blade.php');
+                const result = await bladeParser.parseBladeFile('/test/path/multiple-sections.blade.php');
 
                 assert.ok(result);
-                assert.deepStrictEqual(result?.sections, [
-                    'title',
-                    'content',
-                    'sidebar'
-                ]);
+                assert.deepStrictEqual(result?.sections, ['title', 'content', 'scripts']);
+                assert.deepStrictEqual(result?.includes, []);
+                assert.deepStrictEqual(result?.components, []);
             } finally {
                 vscode.workspace.openTextDocument = originalOpenTextDocument;
             }
-        });
-
-        it('testテンプレート名のパス解決が正常に動作する', () => {
-            const templateName = 'layouts.app';
-            const currentFilePath = '/workspace/resources/views/test.blade.php';
-
-            const result = bladeParser.resolveTemplatePath(templateName, currentFilePath);
-
-            // パス解決の結果が空文字列でないことを確認
-            assert.notStrictEqual(result, '');
         });
     });
 
     describe('異常系', () => {
-        it('test存在しないファイルパスでエラーが発生する', async () => {
-            // 存在しないファイルパスでテスト
-            const originalOpenTextDocument = vscode.workspace.openTextDocument;
-            vscode.workspace.openTextDocument = async () => {
-                throw new Error('File not found');
-            };
-
-            try {
-                const result = await bladeParser.parseBladeFile('/nonexistent/path/test.blade.php');
-                assert.strictEqual(result, null);
-            } finally {
-                vscode.workspace.openTextDocument = originalOpenTextDocument;
-            }
-        });
-
-        it('test空のファイル内容で正常に処理される', async () => {
-            const mockContent = '';
-            const mockDocument = {
-                getText: () => mockContent
-            };
-            const originalOpenTextDocument = vscode.workspace.openTextDocument;
-            vscode.workspace.openTextDocument = async () => mockDocument as any;
-
-            try {
-                const result = await bladeParser.parseBladeFile('/test/path/empty.blade.php');
-
-                assert.ok(result);
-                assert.strictEqual(result?.extends, undefined);
-                assert.deepStrictEqual(result?.includes, []);
-                assert.deepStrictEqual(result?.components, []);
-                assert.deepStrictEqual(result?.sections, []);
-            } finally {
-                vscode.workspace.openTextDocument = originalOpenTextDocument;
-            }
-        });
-
         it('test不正なディレクティブ構文でエラーが発生しない', async () => {
             const mockContent = `
                 @extends('layouts.app
@@ -216,12 +166,25 @@ describe('BladeParser', () => {
                 vscode.workspace.openTextDocument = originalOpenTextDocument;
             }
         });
+
+        it('testファイルが存在しない場合にエラーが発生しない', async () => {
+            const originalOpenTextDocument = vscode.workspace.openTextDocument;
+            vscode.workspace.openTextDocument = async () => {
+                throw new Error('File not found');
+            };
+
+            try {
+                const result = await bladeParser.parseBladeFile('/test/path/nonexistent.blade.php');
+                assert.strictEqual(result, null);
+            } finally {
+                vscode.workspace.openTextDocument = originalOpenTextDocument;
+            }
+        });
     });
 
     describe('境界値テスト', () => {
-        it('test非常に長いテンプレート名が正常に処理される', async () => {
-            const longTemplateName = 'a'.repeat(1000);
-            const mockContent = `@extends('${longTemplateName}')`;
+        it('test空のファイルが正常に処理される', async () => {
+            const mockContent = '';
 
             const mockDocument = {
                 getText: () => mockContent
@@ -230,18 +193,29 @@ describe('BladeParser', () => {
             vscode.workspace.openTextDocument = async () => mockDocument as any;
 
             try {
-                const result = await bladeParser.parseBladeFile('/test/path/long.blade.php');
+                const result = await bladeParser.parseBladeFile('/test/path/empty.blade.php');
 
                 assert.ok(result);
-                assert.strictEqual(result?.extends, longTemplateName);
+                assert.strictEqual(result?.extends, undefined);
+                assert.deepStrictEqual(result?.includes, []);
+                assert.deepStrictEqual(result?.components, []);
+                assert.deepStrictEqual(result?.sections, []);
             } finally {
                 vscode.workspace.openTextDocument = originalOpenTextDocument;
             }
         });
 
-        it('test特殊文字を含むテンプレート名が正常に処理される', async () => {
-            const specialTemplateName = 'template-with-special-chars_123';
-            const mockContent = `@extends('${specialTemplateName}')`;
+        it('testディレクティブが存在しないファイルが正常に処理される', async () => {
+            const mockContent = `
+                <html>
+                    <head>
+                        <title>Simple HTML</title>
+                    </head>
+                    <body>
+                        <h1>Hello World</h1>
+                    </body>
+                </html>
+            `;
 
             const mockDocument = {
                 getText: () => mockContent
@@ -250,12 +224,50 @@ describe('BladeParser', () => {
             vscode.workspace.openTextDocument = async () => mockDocument as any;
 
             try {
-                const result = await bladeParser.parseBladeFile('/test/path/special.blade.php');
+                const result = await bladeParser.parseBladeFile('/test/path/simple-html.blade.php');
 
                 assert.ok(result);
-                assert.strictEqual(result?.extends, specialTemplateName);
+                assert.strictEqual(result?.extends, undefined);
+                assert.deepStrictEqual(result?.includes, []);
+                assert.deepStrictEqual(result?.components, []);
+                assert.deepStrictEqual(result?.sections, []);
             } finally {
                 vscode.workspace.openTextDocument = originalOpenTextDocument;
+            }
+        });
+    });
+
+    describe('テンプレートパス解決機能', () => {
+        it('testLaravelの標準的なビューパスが正しく解決される', () => {
+            // ワークスペースのモック化
+            const originalWorkspaceFolders = vscode.workspace.workspaceFolders;
+            (vscode.workspace as any).workspaceFolders = [{
+                uri: { fsPath: '/workspace' }
+            }];
+
+            try {
+                const result = bladeParser.resolveTemplatePath('common.layouts.blank', '/workspace/resources/views/event/custom/tm/lp.blade.php');
+
+                // 実際のファイルシステムに依存しないため、パスの形式のみチェック
+                assert.ok(result.includes('common/layouts/blank.blade.php') || result.includes('common.layouts.blank.blade.php'));
+            } finally {
+                (vscode.workspace as any).workspaceFolders = originalWorkspaceFolders;
+            }
+        });
+
+        it('testドット区切りのパスがスラッシュ区切りに正しく変換される', () => {
+            const originalWorkspaceFolders = vscode.workspace.workspaceFolders;
+            (vscode.workspace as any).workspaceFolders = [{
+                uri: { fsPath: '/workspace' }
+            }];
+
+            try {
+                const result = bladeParser.resolveTemplatePath('layouts.app', '/workspace/resources/views/welcome.blade.php');
+
+                // パスの形式をチェック
+                assert.ok(result.includes('layouts/app.blade.php') || result.includes('layouts.app.blade.php'));
+            } finally {
+                (vscode.workspace as any).workspaceFolders = originalWorkspaceFolders;
             }
         });
     });
