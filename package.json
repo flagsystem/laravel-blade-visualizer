@@ -73,6 +73,17 @@
                     "group": "navigation@9"
                 }
             ]
+        },
+        "configuration": {
+            "type": "object",
+            "title": "Laravel Blade Visualizer Settings",
+            "properties": {
+                "laravelBladeVisualizer.laravelRoot": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Laravel project root directory (path containing resources/views). If empty, auto-detect nearest resources/views from the current file."
+                }
+            }
         }
     },
     "scripts": {

@@ -153,10 +153,26 @@ npm run package:version
 - ダークテーマ・ライトテーマの両方に対応
 
 ### 設定オプション
-現在のバージョンでは設定オプションは提供していませんが、今後のバージョンで以下の設定を追加予定：
-- ツリーの展開状態の記憶
-- 表示する関係性の種類の選択
-- カスタムアイコンの設定
+
+#### Laravelルートディレクトリの設定
+- settings.json に以下を記述（ワークスペース推奨）:
+
+```jsonc
+// .vscode/settings.json
+{
+  "laravelBladeVisualizer.laravelRoot": "my-laravel-app"
+}
+```
+
+- 直接 `resources/views` を指すことも可能:
+
+```jsonc
+{
+  "laravelBladeVisualizer.laravelRoot": "my-laravel-app/resources/views"
+}
+```
+
+- 未設定（空）の場合は、現在ファイルから最寄りの `resources/views` を自動検出します。
 
 ## 🔍 トラブルシューティング
 

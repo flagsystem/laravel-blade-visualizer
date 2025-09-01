@@ -34,12 +34,12 @@ const vscode = __importStar(require("vscode"));
  */
 class BladeParser {
     constructor() {
-        /** @extendsディレクティブを検出する正規表現 */
-        this.extendsRegex = /@extends\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
-        /** @includeディレクティブを検出する正規表現 */
-        this.includeRegex = /@include\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
-        /** @componentディレクティブを検出する正規表現 */
-        this.componentRegex = /@component\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
+        /** @extendsディレクティブを検出する正規表現（単一一致のため /g は付与しない） */
+        this.extendsRegex = /@extends\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/;
+        /** @includeディレクティブを検出する正規表現（追加引数を許容） */
+        this.includeRegex = /@include\s*\(\s*['"`]([^'"`]+)['"`](?:\s*,[^)]*)?\)/g;
+        /** @componentディレクティブを検出する正規表現（追加引数を許容） */
+        this.componentRegex = /@component\s*\(\s*['"`]([^'"`]+)['"`](?:\s*,[^)]*)?\)/g;
         /** @sectionディレクティブを検出する正規表現 */
         this.sectionRegex = /@section\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
         /** 解析結果のキャッシュ（ファイルパス→テンプレート） */
@@ -158,6 +158,8 @@ class BladeParser {
                 template.extendsPath = resolved && fs.existsSync(resolved) ? resolved : resolved || undefined;
             }
             // @includeディレクティブの解析（複数存在する可能性があるためループ処理）
+            // グローバル正規表現はfileごとにlastIndexをリセット
+            this.includeRegex.lastIndex = 0;
             let includeMatch;
             while ((includeMatch = this.includeRegex.exec(content)) !== null) {
                 template.includes.push(includeMatch[1]);
@@ -167,6 +169,7 @@ class BladeParser {
                 }
             }
             // @componentディレクティブの解析
+            this.componentRegex.lastIndex = 0;
             let componentMatch;
             while ((componentMatch = this.componentRegex.exec(content)) !== null) {
                 template.components.push(componentMatch[1]);
@@ -176,6 +179,7 @@ class BladeParser {
                 }
             }
             // @sectionディレクティブの解析
+            this.sectionRegex.lastIndex = 0;
             let sectionMatch;
             while ((sectionMatch = this.sectionRegex.exec(content)) !== null) {
                 template.sections.push(sectionMatch[1]);
@@ -243,7 +247,7 @@ class BladeParser {
                 level += 1;
             }
             // 次に、各チェーンノードについて include / component の子要素を構築（extendsが先に来る順序を保証）
-            const startIndex = chainNodes.length >= 3 ? 2 : 0;
+            const startIndex = chainNodes.length >= 2 ? 1 : 0;
             for (let i = startIndex; i < chainNodes.length; i++) {
                 const node = chainNodes[i];
                 await this.buildDescendantTree(node, node.template, i + 1);
@@ -378,21 +382,18 @@ class BladeParser {
         if (cached !== undefined) {
             return cached;
         }
-        // ワークスペースのルートディレクトリを取得
-        const workspaceFolders = vscode.workspace.workspaceFolders;
-        const workspaceRoot = workspaceFolders && workspaceFolders.length > 0
-            ? workspaceFolders[0].uri.fsPath
-            : path.parse(currentFilePath).root;
+        // ビュールート（resources/views）を決定（設定値優先、無指定なら自動検出 → ワークスペース）
+        const viewsRoot = getViewsRootFor(currentFilePath);
         // 試行パス一覧（存在確認は後段で行うが、存在しなくても最も妥当なパスを返す）
-        const byWorkspaceDot = path.join(workspaceRoot, 'resources', 'views', `${cleanName}.blade.php`);
-        const byWorkspaceSlashes = path.join(workspaceRoot, 'resources', 'views', cleanName.replace(/\./g, '/') + '.blade.php');
+        const byViewsDot = path.join(viewsRoot, `${cleanName}.blade.php`);
+        const byViewsSlashes = path.join(viewsRoot, cleanName.replace(/\./g, '/') + '.blade.php');
         const byCurrentDot = path.resolve(path.dirname(currentFilePath), `${cleanName}.blade.php`);
         const byCurrentSlashes = path.resolve(path.dirname(currentFilePath), cleanName.replace(/\./g, '/') + '.blade.php');
         const byParentDot = path.resolve(path.dirname(currentFilePath), '..', `${cleanName}.blade.php`);
         const byParentSlashes = path.resolve(path.dirname(currentFilePath), '..', cleanName.replace(/\./g, '/') + '.blade.php');
         const possiblePaths = [
-            byWorkspaceDot,
-            byWorkspaceSlashes,
+            byViewsDot,
+            byViewsSlashes,
             byCurrentDot,
             byCurrentSlashes,
             byParentDot,
@@ -410,7 +411,7 @@ class BladeParser {
             }
         }
         // 実ファイルが無い場合でも、形式上妥当な最初の候補を返す（テストは形式のみ検証）
-        const fallback = byWorkspaceSlashes;
+        const fallback = byViewsSlashes;
         this.resolveCache.set(cacheKey, fallback);
         return fallback;
     }
@@ -450,11 +451,111 @@ class BladeParser {
 }
 exports.BladeParser = BladeParser;
 /**
+ * 設定されたLaravelプロジェクトルートを取得するヘルパー
+ *
+ * @returns {string | undefined} 設定値から解決したLaravelルート（絶対パス）
+ */
+function getConfiguredLaravelRoot() {
+    try {
+        const cfgAny = vscode.workspace.getConfiguration('laravelBladeVisualizer');
+        let value;
+        if (cfgAny && typeof cfgAny.get === 'function') {
+            value = cfgAny.get('laravelRoot');
+        }
+        else if (cfgAny && typeof cfgAny === 'object') {
+            value = cfgAny['laravelRoot'];
+        }
+        if (typeof value !== 'string' || value.trim() === '') {
+            return undefined;
+        }
+        const configured = value;
+        if (path.isAbsolute(configured)) {
+            return configured;
+        }
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        const workspaceRoot = workspaceFolders && workspaceFolders.length > 0
+            ? workspaceFolders[0].uri.fsPath
+            : undefined;
+        return workspaceRoot ? path.join(workspaceRoot, configured) : configured;
+    }
+    catch {
+        return undefined;
+    }
+}
+/**
+ * 現在のファイルから上位ディレクトリを遡って、最寄りのLaravelプロジェクトルートを自動検出する
+ *
+ * @param {string} currentFilePath - 現在のファイルパス
+ * @returns {string | undefined} 自動検出したLaravelルート（絶対パス）
+ */
+function detectProjectRootFrom(currentFilePath) {
+    let dir = path.dirname(currentFilePath);
+    // ルートに到達するまで親を辿る
+    while (true) {
+        const viewsPath = path.join(dir, 'resources', 'views');
+        try {
+            if (fs.existsSync(viewsPath)) {
+                return dir;
+            }
+        }
+        catch {
+            // 存在確認失敗時は無視
+        }
+        const parent = path.dirname(dir);
+        if (parent === dir) {
+            break;
+        }
+        dir = parent;
+    }
+    // ワークスペース直下にもviewsがある場合はそれを使用
+    const workspaceFolders = vscode.workspace.workspaceFolders || [];
+    for (const folder of workspaceFolders) {
+        const candidate = folder.uri.fsPath;
+        const viewsPath = path.join(candidate, 'resources', 'views');
+        if (fs.existsSync(viewsPath)) {
+            return candidate;
+        }
+    }
+    return undefined;
+}
+/**
+ * 現在のファイルに対するビュールート（resources/views）の絶対パスを取得する
+ * 設定値（laravelRoot）を優先し、無指定の場合は自動検出を行う
+ *
+ * @param {string} currentFilePath - 現在のファイルパス
+ * @returns {string} ビュールート（resources/views）の絶対パス
+ */
+function getViewsRootFor(currentFilePath) {
+    const configuredRoot = getConfiguredLaravelRoot();
+    let projectRoot = configuredRoot ?? detectProjectRootFrom(currentFilePath);
+    if (!projectRoot) {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        projectRoot = workspaceFolders && workspaceFolders.length > 0
+            ? workspaceFolders[0].uri.fsPath
+            : path.parse(currentFilePath).root;
+    }
+    // 設定値が直接 resources/views を指している場合にも対応
+    const isViewsDir = path.basename(projectRoot) === 'views' && path.basename(path.dirname(projectRoot)) === 'resources';
+    return isViewsDir ? projectRoot : path.join(projectRoot, 'resources', 'views');
+}
+/**
  * ビュー内の相対表示名を計算するユーティリティ
  * resources/views配下であれば相対パスを返し、そうでなければベース名を返す
  */
 function computeDisplayName(filePath) {
     const normalized = filePath.replace(/\\/g, '/');
+    // 設定値・自動検出に基づくviewsルートからの相対パス
+    try {
+        const viewsRoot = getViewsRootFor(filePath).replace(/\\/g, '/');
+        const viewsRootWithSlash = viewsRoot.endsWith('/') ? viewsRoot : viewsRoot + '/';
+        if (normalized.startsWith(viewsRootWithSlash)) {
+            return normalized.substring(viewsRootWithSlash.length);
+        }
+    }
+    catch {
+        // 失敗時は従来ロジックにフォールバック
+    }
+    // 既定の検出（従来のマーカー方式）
     const marker = '/resources/views/';
     const idx = normalized.indexOf(marker);
     if (idx >= 0) {
