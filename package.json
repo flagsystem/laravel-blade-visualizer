@@ -2,7 +2,7 @@
     "name": "laravel-blade-visualizer",
     "displayName": "Laravel Blade Visualizer",
     "description": "Laravel Bladeテンプレートファイルの親子関係を視覚化し、選択したファイルの完全なツリー構造を表示します",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "engines": {
         "vscode": "^1.74.0"
     },
