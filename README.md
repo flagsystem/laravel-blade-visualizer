@@ -224,10 +224,17 @@ npm run package:version
 
 ## 📞 サポート
 
-### 機能要望や問題の報告など
-- [GitHub Issues](https://github.com/flagsystem/laravel-blade-visualizer/issues)で投稿
+### 問題の報告
+- [GitHub Issues](https://github.com/flagsystem/laravel-blade-visualizer/issues)で問題を報告
 - バグ報告時は再現手順と環境情報を含めてください
+
+### 機能要望
+- [GitHub Discussions](https://github.com/flagsystem/laravel-blade-visualizer/discussions)で機能要望を投稿
 - 具体的なユースケースと期待する動作を説明してください
+
+### 質問・相談
+- [GitHub Discussions](https://github.com/flagsystem/laravel-blade-visualizer/discussions)で質問・相談を投稿
+- コミュニティからの回答をお待ちください
 
 ---
 
